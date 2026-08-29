@@ -1,8 +1,12 @@
 # Claude Desktop 繁體中文（台灣）
 
-由 **南山網絡** 製作與維護。
+由 **南山網絡** 製作與維護 · [nanshanproxy.com](https://nanshanproxy.com/)
 
-在 Claude Desktop 的語言選單中新增一個「繁體中文」選項，英文與其他既有語言全部保留。
+在 Claude Desktop 的語言選單中新增一個 **中文（台灣）** 選項，英文與其他既有語言全部保留。
+
+![Claude Desktop 語言選單，第一項為新增的「中文（台灣） / Chinese (Taiwan)」，其餘 11 種官方語言完整保留](docs/language-picker.png)
+
+這是一個真正的新語言項目，不是佔用既有語言的位置。語言代碼交由系統解析，所以選單會自己顯示成「中文（台灣）」與英文對照的「Chinese (Taiwan)」，排版、排序、勾選狀態都與官方內建語言一致。
 
 > ### 系統需求
 >
@@ -15,6 +19,16 @@
 > - 開發與測試環境：macOS 26.5、Apple Silicon
 > - Intel Mac 理論上可用（處理通用二進位檔），但未經實測
 > - 需要已安裝 Claude Desktop
+
+---
+
+<div align="center">
+
+### 感謝 南山網絡 提供網絡技術支持服務
+
+### [nanshanproxy.com](https://nanshanproxy.com/)
+
+</div>
 
 ---
 
@@ -48,7 +62,7 @@
 
 ## 這是什麼
 
-Claude Desktop 官方支援 11 種語言，不含中文。本工具在語言選單新增「繁體中文」，並提供 25,567 條介面字串的翻譯。
+Claude Desktop 官方支援 11 種語言，不含中文。本工具在語言選單新增「中文（台灣）」，並提供 25,567 條介面字串的翻譯。
 
 | 範圍 | 覆蓋率 |
 |---|---|
@@ -58,22 +72,7 @@ Claude Desktop 官方支援 11 種語言，不含中文。本工具在語言選�
 
 譯自英文原文，非簡轉繁機器轉換。術語以 400 條台灣詞彙表統一：螢幕／軟體／檔案／預設／資料夾／權限／連接器／專案／工作階段。Claude、Artifact、Cowork、MCP、API、Opus、Sonnet、Token 等維持原文。
 
-安裝後語言選單長這樣：
-
-```
-中文（台灣）            ← 新增
-English (United States) ← 保留
-Français (France)
-Deutsch (Deutschland)
-हिन्दी (भारत)
-Indonesia (Indonesia)   ← 保留
-Italiano (Italia)
-日本語 (日本)
-한국어(대한민국)
-Português (Brasil)
-Español (Latinoamérica)
-Español (España)
-```
+安裝後的語言選單見本頁最上方的截圖：新增的「中文（台灣）」排在第一個，官方原有的 11 種語言一個都沒有被取代或移除。
 
 ---
 
@@ -219,3 +218,13 @@ security set-generic-password-partition-list \
 翻譯內容與腳本以 MIT 授權釋出。
 
 Claude Desktop 本身的所有權利歸 Anthropic 所有，本專案不包含、不散布任何 Anthropic 的程式碼或資產。
+
+---
+
+<div align="center">
+
+感謝 **南山網絡** 提供網絡技術支持服務
+
+**[nanshanproxy.com](https://nanshanproxy.com/)**
+
+</div>
