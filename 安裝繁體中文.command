@@ -1,6 +1,6 @@
 #!/bin/bash
 # Claude Desktop 繁體中文（台灣）— 安裝腳本
-# 南山網絡  https://github.com/
+# 南山網絡  https://github.com/777-W/claude-desktop-zhtw-mac
 #
 # 首次安裝與 Claude 更新後重新套用是同一個動作，重複執行安全。
 # 僅支援 macOS。整套流程依賴 codesign、launchctl、/Applications 與 macOS 鑰匙圈，
