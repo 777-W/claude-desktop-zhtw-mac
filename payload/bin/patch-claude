@@ -1,0 +1,1776 @@
+#!/usr/bin/env python3
+"""Claude Desktop 繁體中文 — 版本無關的修補器。
+
+設計原則：不比對任何 minified 變數名或 chunk 檔名，因此 Claude 更新後仍可套用。
+  1. 從 claude.ai 抓當前線上的 en-US catalog（message id 以英文原文對映翻譯記憶）
+  2. asar 內只改 package.json 的 main，並加入一支 boot shim
+  3. 翻譯資料放在 asar 之外的 Contents/Resources/zhtw/
+  4. 重建 asar 後同步更新 Info.plist 的 ElectronAsarIntegrity 雜湊
+  5. 重簽章時剝除綁定 Apple 團隊的 entitlement，並以 exec 探針把關
+  6. 安裝過程**完全不啟動 App**。把關的是 exec 探針（在 /Applications 被動到
+     之前就跑完），不是啟動驗證。舊的「啟動兩次看心跳」保留在 --verify 與
+     verify 子命令底下，需要時才用（見 verify_runtime）
+  7. 裝一支 LaunchAgent 盯著 bundle 被換掉。它**只偵測與通知，永遠不動手**：
+     Claude 被官方版整包換掉時貼一則通知中心橫幅，真正的重套要使用者明確確認
+     （見 watch / adapt）。理由是每一次重簽章都會讓 macOS 跟使用者要一次鑰匙圈
+     密碼（cdhash 綁定，見 README「Costs」），背景重簽等於在使用者沒有預期、
+     也無法預測的時刻要密碼。全程事件驅動：沒有 StartInterval，沒有輪詢，
+     穩態下不跑任何東西
+"""
+from __future__ import annotations
+import contextlib, fcntl, hashlib, json, os, plistlib, re, select, shlex, shutil, signal, socket, subprocess, sys, tempfile, time, urllib.request
+import datetime as dt
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import asar
+
+HOME = Path.home()
+PROJ = Path(__file__).resolve().parent.parent
+# 這三個根路徑可以用環境變數覆寫。預設值與過去逐字相同，一般使用完全不受影響；
+# 覆寫存在的唯一理由是讓測試在 fixture bundle 上跑完整流程，永遠不必碰
+# /Applications，也永遠不會對使用者正在用的 Claude 產生任何副作用。
+APP = Path(os.environ.get("ZHTW_APP") or "/Applications/Claude.app")
+PAYLOAD = PROJ / "payload"
+TM_PATH = PROJ / "tm" / "tm.json"
+STATE = Path(os.environ.get("ZHTW_STATE") or (PROJ / "state.json"))
+LOCALE = "zh-TW"                     # 新增的語言代碼（不再劫持既有語言）
+DISPLAY = "繁體中文"
+BACKUP_PREFIX = "Claude.backup-before-zhTW-"
+TEAM_BOUND = ("com.apple.application-identifier",
+              "com.apple.developer.team-identifier",
+              "keychain-access-groups",
+              "com.apple.security.virtualization")
+UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
+
+# boot shim 寫出的執行期證據。install 只信這些標記，不信「安裝步驟沒報錯」。
+ZDIR = Path(os.environ.get("ZHTW_DIR") or (HOME / "claude-zhtw"))
+BOOTLOG = ZDIR / "boot.log"
+CACHE_META = ZDIR / "chunk-cache.json"
+# 與 shim 的 PATCH_VERSION 對齊；改一邊就要改另一邊。shim 只認同版號的磁碟快取，
+# 版號不合會忽略快取重新探測，status 也據此把「鎖定但已作廢」講清楚。
+PATCH_VERSION = 2
+CACHE_BODY = ZDIR / "chunk-cache.js"
+HEALTH_F = ZDIR / "health.json"
+TAG_HEALTHY = "ZHTW-HEALTHY"        # renderer 回報畫面非空（唯一的通過條件）
+TAG_PATCHED = "ZHTW-PATCHED"        # 改寫過的 chunk 真的被供應出去
+TAG_DISCOVER = "ZHTW-DISCOVERED"    # 背景 discovery 找到含 locale 白名單的 chunk
+TAG_INLINE = "ZHTW-INLINE-HIT"      # 就地探測當場找到並套用（新流程的正常路徑）
+TAG_SCRIPTFAIL = "ZHTW-SCRIPTFAIL"  # 我們改寫的資源在 renderer 載入失敗（硬性回滾）
+TAG_BOOTFAIL = "ZHTW-BOOTFAIL"      # bootstrap 改寫失敗（硬性回滾，見 shim 內註解）
+TAG_DISARM = "ZHTW-DISARM"
+TAG_FAILCOUNT = "ZHTW-FAILCOUNT"   # shim 真的記下一次「頁面起跑後失敗」
+DISARM_AT = 2                      # 與 shim 的 DISARM_AT 對齊；改一邊就要改另一邊
+# shim 的自我修復真的開了火：畫面在窗口內沒有回報健康，shim 已自行解除改寫並
+# 重載一次。之後才出現的 TAG_HEALTHY 是「退回英文之後」的健康，不再能證明改寫
+# 沒把畫面弄壞 —— 少了這一條，安裝器會被自我修復騙過去，把壞掉的改寫判成通過。
+# 語意等同 TAG_SCRIPTFAIL：直接證據顯示我們的改寫讓畫面不可用 ⇒ 硬性回滾。
+TAG_RELOADED = "ZHTW-RELOADED"
+# 線上前端改版把 locale 白名單搬走了 —— shim 抓到了形狀相符的 chunk，但裡面
+# 沒有白名單。這是**線上**的事，bundle 一個位元組都沒變，重簽章對它毫無幫助。
+# status 用它把「介面是英文因為遠端改版」和「因為 bundle 被官方版換掉」分開講。
+TAG_REMOTE = "ZHTW-REMOTE-SHAPE"
+CLAUDE_BIN_REL = "Contents/MacOS/Claude"
+
+# ── LaunchAgent（Claude 更新後只通知，不重套）───────────────────────────
+SELF = Path(__file__).resolve()
+AGENT_LABEL = "com.nanshan.claude-zhtw.watch"
+# 舊版的背景服務。label 改名是刻意的：舊 plist 的 ProgramArguments 會執行 install，
+# 只要它還載入著，Claude 一更新就會在背景重簽章並跳密碼框。agent-install 與
+# agent-uninstall 都會把這幾個一併拆乾淨（見 legacy_cleanup）。
+# 舊命名必須留著，否則升級的人機器上會殘留一支拆不掉的舊服務。
+LEGACY_LABELS = ("com.nanshan.claude-zhtw.reapply",
+                 "com.nanshan.claude-zhtw.reapply.await-quit",
+                 "com.nanyu.claude-zhtw.watch",
+                 "com.nanyu.claude-zhtw.reapply",
+                 "com.nanyu.claude-zhtw.reapply.await-quit",
+                 "com.claude.zhtw.reapply")
+AGENT_DIR = HOME / "Library/LaunchAgents"
+AGENT_PLIST = AGENT_DIR / f"{AGENT_LABEL}.plist"
+AGENT_LOG = ZDIR / "watch.log"
+AGENT_LOCK = ZDIR / "adapt.lock"
+AGENT_THROTTLE = 120
+# 「Claude 更新了，但還沒有人確認要重套」的持久標記。通知橫幅會自己消失，
+# 標記不會 —— status 與桌面腳本靠它講話，「同一個 build 只通知一次」也靠它。
+PENDING_F = ZDIR / "adaptation-pending.json"
+FAILED_F = ZDIR / "reapply-failed.json"   # 這個版本套用失敗過（只作紀錄，不擋人）
+
+
+def sh(cmd, check=True):
+    r = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    if check and r.returncode:
+        raise SystemExit(f"命令失敗: {' '.join(cmd)}\n{r.stdout.strip()}")
+    return r
+
+
+def norm(s): return re.sub(r"\s+", " ", s).strip()
+
+
+def fetch_catalog(url):
+    try:
+        req = urllib.request.Request(url, headers=UA)
+        with urllib.request.urlopen(req, timeout=30) as r:
+            if r.headers.get_content_type() != "application/json":
+                return None
+            return json.loads(r.read().decode("utf-8"))
+    except Exception:
+        return None
+
+
+def source_catalogs(app: Path):
+    """英文原文來源。優先用 boot shim 存下的線上快照（含新版新增字串），
+    否則退回 App 內建 —— 後者也會隨 Claude 更新，只是可能略舊於線上。
+    直接用 urllib 抓 claude.ai 會被 Cloudflare 擋 403，所以不在此嘗試。"""
+    i = app / "Contents/Resources/ion-dist/i18n"
+    builtin_main = json.loads((i / "en-US.json").read_text("utf-8"))
+    builtin_dyn = json.loads((i / "dynamic/en-US.json").read_text("utf-8"))
+    snap = PROJ / "remote-en.json"
+    if snap.is_file():
+        try:
+            live = json.loads(snap.read_text("utf-8"))
+            if isinstance(live, dict) and len(live) >= len(builtin_main):
+                merged = dict(builtin_main); merged.update(live)
+                return merged, builtin_dyn, f"線上快照 {len(live)} 條 + App 內建"
+        except Exception:
+            pass
+    return builtin_main, builtin_dyn, "App 內建"
+
+
+GATED_NOTE = ("gated_messages 英文原字串 -> 繁體中文。伺服器不認得 zh-TW，因此送回英文 "
+              "gated_messages；boot shim 逐條替換，未命中的保持英文。本檔由 "
+              "`patch-claude gated` / `install` 從 tm/tm.json 產生，不要手改。"
+              "未譯字串每次啟動會被 shim 傾印到 ~/claude-zhtw/gated-pending.json。")
+
+
+def build_gated(en2zh=None):
+    """把翻譯記憶轉成「英文原字串 -> 繁體中文」對照表，供 boot shim 改寫 bootstrap。"""
+    if en2zh is None:
+        tm = json.loads(TM_PATH.read_text("utf-8"))
+        en2zh = {v["en"]: v["zh"] for v in tm.values() if isinstance(v.get("zh"), str)}
+    out = {"_comment": GATED_NOTE}
+    for en, zh in en2zh.items():
+        if not isinstance(en, str) or not isinstance(zh, str):
+            continue
+        if not en.strip() or not zh.strip() or zh == en:
+            continue
+        out.setdefault(en, zh)
+    (PAYLOAD / "gated.json").write_text(
+        json.dumps(out, ensure_ascii=False, sort_keys=True, separators=(",", ":")), "utf-8")
+    return len(out) - 1
+
+
+def build_catalogs(app: Path, outdir: Path):
+    tm = json.loads(TM_PATH.read_text("utf-8"))
+    en2zh = {v["en"]: v["zh"] for v in tm.values() if isinstance(v.get("zh"), str)}
+    en2zh_n = {norm(k): v for k, v in en2zh.items()}
+    main_en, dyn_en, src = source_catalogs(app)
+    outdir.mkdir(parents=True, exist_ok=True)
+    stats = {}
+    for name, cat in (("main", main_en), ("dynamic", dyn_en)):
+        out, hit = {}, 0
+        for k, v in cat.items():
+            zh = None
+            if isinstance(v, str):
+                zh = en2zh.get(v) or en2zh_n.get(norm(v))
+            if zh:
+                out[k] = zh; hit += 1
+            else:
+                out[k] = v
+        (outdir / f"{name}.json").write_text(
+            json.dumps(out, ensure_ascii=False, separators=(",", ":")), "utf-8")
+        stats[name] = (hit, len(cat))
+    stats["gated"] = (build_gated(en2zh), 0)
+    shutil.copy2(PAYLOAD / "overrides.json", outdir / "overrides.json")
+    shutil.copy2(PAYLOAD / "gated.json", outdir / "gated.json")
+    (outdir / "config.json").write_text(
+        json.dumps({"locale": LOCALE, "displayName": DISPLAY}, ensure_ascii=False), "utf-8")
+    # 桌面外殼（原生選單列、設定頁）由主行程讀 Contents/Resources/<locale>.json。
+    # 來源必須是**英文**原文，才能對映翻譯記憶。
+    # zh-TW.json 是**新增**的檔，不能拿它自己的存在當前提。主行程
+    # ytt() 用未錨定的 /[a-z]{2}-[A-Z]{2}/ 掃 Resources 目錄，zh-TW.json 會被認得；
+    # Ctt()/Stt() 沒有白名單，唯一驗證就是 readFileSync 成功。
+    shell = app / "Contents/Resources" / f"{LOCALE}.json"
+    shell_en = app / "Contents/Resources/en-US.json"
+    if shell_en.is_file():
+        cat = json.loads(shell_en.read_text("utf-8"))
+        out, hit = {}, 0
+        for k, v in cat.items():
+            zh = en2zh.get(v) or en2zh_n.get(norm(v)) if isinstance(v, str) else None
+            out[k] = zh or v
+            if zh: hit += 1
+        shell.write_text(json.dumps(out, ensure_ascii=False), "utf-8")
+        stats["shell"] = (hit, len(cat))
+    # 舊的 id-ID 劫持把 Contents/Resources/id-ID.json 覆寫成中文，而 install() 是對
+    # /Applications/Claude.app 做 ditto，會把污染一路複製下來。改用真 zh-TW 之後
+    # 必須還原成官方印尼文，否則印尼文使用者路徑會殘留中文。來源只能是官方備份。
+    stale = app / "Contents/Resources/id-ID.json"
+    if stale.is_file():
+        try:
+            polluted = any(ord(c) > 0x2E7F for c in stale.read_text("utf-8")[:4000])
+        except Exception:
+            polluted = False
+        if polluted:
+            for bk in sorted(APP.parent.glob(BACKUP_PREFIX + "*.app")):
+                s_ = bk / "Contents/Resources/id-ID.json"
+                if s_.is_file():
+                    shutil.copy2(s_, stale)
+                    stats["id-ID 還原"] = (1, 0)
+                    break
+            else:
+                print("  警告：id-ID.json 已被舊補丁污染，且找不到官方備份可還原")
+    return stats, src
+
+
+ASAR_BLOCK = 4 * 1024 * 1024
+
+
+def file_integrity(data: bytes) -> dict:
+    blocks = [hashlib.sha256(data[o:o + ASAR_BLOCK]).hexdigest()
+              for o in range(0, len(data), ASAR_BLOCK)] or [hashlib.sha256(data).hexdigest()]
+    return {"algorithm": "SHA256", "hash": hashlib.sha256(data).hexdigest(),
+            "blockSize": ASAR_BLOCK, "blocks": blocks}
+
+
+def patch_asar(app: Path):
+    p = app / "Contents/Resources/app.asar"
+    header, files = asar.extract_all(str(p))
+    pkg = json.loads(files["package.json"])
+    orig = pkg.get("main")
+    if orig == "zhtw-boot.js":
+        raise SystemExit("app.asar 已被修補過；請先還原官方版再執行")
+    boot = (PAYLOAD / "zhtw-boot.js").read_text("utf-8").replace("__ORIGINAL_MAIN__", orig)
+    pkg["main"] = "zhtw-boot.js"
+    files["package.json"] = json.dumps(pkg, indent=2).encode("utf-8")
+    files["zhtw-boot.js"] = boot.encode("utf-8")
+    header["files"]["zhtw-boot.js"] = {"size": len(files["zhtw-boot.js"]), "offset": "0"}
+    # asar header 內每個檔案各自帶 integrity（4MB 分塊雜湊）。
+    # 改過或新增的檔案必須同步更新，否則 Electron 會拒絕載入整個封存。
+    for name in ("package.json", "zhtw-boot.js"):
+        header["files"][name]["integrity"] = file_integrity(files[name])
+    header_json = asar.write(str(p), header, files)
+    digest = hashlib.sha256(header_json).hexdigest()
+    # 每個 Helper / framework 都各自帶一份 ElectronAsarIntegrity，
+    # 漏掉任何一份，該行程啟動時就會 ASAR Integrity Violation。
+    n = 0
+    for ip in app.rglob("Info.plist"):
+        try:
+            d = plistlib.loads(ip.read_bytes())
+        except Exception:
+            continue
+        integ = d.get("ElectronAsarIntegrity")
+        if not integ:
+            continue
+        for key in list(integ):
+            if isinstance(integ[key], dict) and "hash" in integ[key]:
+                integ[key]["hash"] = digest
+        ip.write_bytes(plistlib.dumps(d))
+        n += 1
+    return orig, digest, n
+
+
+def entitlements(p: Path):
+    r = sh(["codesign", "-d", "--entitlements", ":-", str(p)], check=False)
+    try:
+        return plistlib.loads(r.stdout[r.stdout.index("<?xml"):].encode("utf-8"))
+    except Exception:
+        return {}
+
+
+# ── designated requirement（讓 Squirrel 的更新驗證還活著）───────────────
+#
+# Claude 內建 Squirrel.Mac 自動更新。Squirrel 的驗證流程是：
+#   SecCodeCopySelf -> SecCodeCopyDesignatedRequirement    （從**執行中的**自己取 DR）
+#   SecRequirementCopyData / SecRequirementCreateWithData  （序列化交給 ShipIt）
+#   SecStaticCodeCheckValidityWithErrors(下載到的更新, 0x19, 那個 DR)
+# 這六個符號可以直接在 Squirrel 與 ShipIt 的二進位裡看到（nm -u），0x19 是
+# 呼叫點上的常數（kSecCSCheckAllArchitectures|kSecCSCheckNestedCode|kSecCSStrictValidate）。
+#
+# 我們 ad-hoc 重簽之後，codesign 產生的隱含 DR 是 `cdhash H"..."` 形式。官方
+# 更新是 Anthropic 憑證簽的，cdhash 不可能相同 ⇒ 驗證必敗（errSecCSReqFailed
+# -67050），ShipIt 記成 SQRLCodeSignatureErrorDomain Code=-1，更新永遠裝不上。
+#
+# 解法是 codesign 的 -r：外層 bundle 明確宣告一條**兩支**的 DR ——
+#
+#   designated => (Anthropic 那條憑證式 requirement)
+#                 or (identifier "<同一個 id>" and !(anchor apple generic))
+#
+# 左支給 Squirrel：官方更新是 Anthropic 憑證簽的，滿足左支 ⇒ 更新裝得上去。
+# 右支給登入鑰匙圈：macOS 記錄「永遠允許」時，抄走的正是這條 DR
+# （SecTrustedApplicationCreateFromPath -> SecCodeCopyDesignatedRequirement），
+# 之後每次啟動拿**執行中的行程**去比對它。只宣告左支的話，我們自己的 ad-hoc
+# 簽章永遠比不過憑證條件，「永遠允許」就變成永遠不可能生效；右支讓我們自己也
+# 滿足自己宣告的 DR，授權因此存得住。
+#
+# 右支的代價，講清楚：任何「宣告同一個 bundle id、且不是 Apple 錨定」的程式碼
+# 都滿足它，所以能寫進 ShipIt 快取的人可以塞一份未經簽章的 bundle 冒充更新。
+# 這需要本機寫入權限，而有本機寫入權限的人有更省事的攻擊手段。使用者在知情下
+# 選了這個取捨，因為每次啟動都要輸入密碼是這個專案最痛的問題。
+#
+# 兩支的 id 都從**同一個來源**推導（見 official_dr），所以不可能各走各的。
+# 左支一律**從磁碟上真正的 Anthropic bundle 讀**，不硬編碼，Anthropic 換憑證或
+# 換 OU 時自動跟著走。
+def designated_requirement(p: Path) -> str:
+    """p 目前宣告的 designated requirement **運算式**（讀不到就是空字串）。
+
+    去掉 `designated => ` 前綴，因為 codesign 的 -R 與 SecRequirementCreateWith‐
+    String 都只吃單一 requirement，不吃 requirement set。要寫回去給 -r 的時候
+    再由 compose_dr() 把前綴加回來。
+    """
+    r = sh(["codesign", "-d", "-r-", str(p)], check=False)
+    for line in r.stdout.splitlines():
+        line = line.strip()
+        # 簽章裡沒有內嵌 requirement 時，codesign 會**推導**一條出來，並在行首
+        # 加 "# " 表示「這是隱含的」。推導出來的那條一樣是合法的 requirement
+        # 原文，也正是我們要宣告的東西，所以把註解記號去掉照收。
+        # 目前 Anthropic 是內嵌的（沒有 "#"），但 Developer ID 簽章不內嵌才是
+        # 常態，寫死「一定沒有 #」等於賭 Anthropic 永遠不改簽法。
+        if line.startswith("#"):
+            line = line.lstrip("#").strip()
+        if line.startswith("designated =>"):
+            return line[len("designated =>"):].strip()
+    return ""
+
+
+def is_official_dr(req: str) -> bool:
+    """這條 DR 是憑證式（官方簽章）而不是 ad-hoc 的 cdhash 式嗎？
+
+    只有憑證式的才值得宣告：cdhash 綁的是某一個 build 的雜湊，抄過來對官方
+    更新一樣不成立，宣告它毫無意義。
+
+    判準刻意只看「錨定到 Apple」＋「有 leaf 憑證條件」＋「沒有 cdhash」，不看
+    是 subject.OU 還是 subject.CN：Anthropic 目前內嵌的那條用 OU，而 codesign
+    替 Developer ID 推導出來的那條用 CN。認死其中一種，就會在對方換簽法的那天
+    悄悄失效。leaf 條件不可省 —— 只有 `anchor apple generic` 的話，任何 Apple
+    錨定的程式都能冒充更新。
+
+    `!` 一出現就否決，這條是承重的：compose_dr() 合成出來的 DR 右支帶著
+    `!(anchor apple generic)`（codesign 讀回來會正規化成 `! anchor apple
+    generic`），其餘特徵和官方那條一模一樣。少了這一條，重裝時 official_dr()
+    會把**我們自己上一次合成的結果**當成官方來源，於是每裝一次就多包一層
+    `(... or ...) or (...)`。官方簽章推導或內嵌的 DR 從來不含 `!`。
+    """
+    return is_cert_dr(req) and "!" not in req
+
+
+def is_cert_dr(req: str) -> bool:
+    """這條 DR 有沒有一支是憑證條件？—— 也就是「官方更新驗得過嗎」。
+
+    is_official_dr() 問的是「這個 bundle 本身是不是官方簽的」，多一條 `!` 否決；
+    這裡問的是另一件事，合成出來的 DR 左支仍然是憑證條件，官方更新照樣滿足，
+    所以不能用同一個判準。status 報「內建自動更新可不可用」用的是這一個。
+    """
+    return ("anchor apple generic" in req
+            and "certificate leaf[" in req
+            and "cdhash" not in req)
+
+
+def code_identifier(p: Path) -> str:
+    """p 的簽章識別碼（codesign 的 `Identifier=`）。"""
+    r = sh(["codesign", "-dv", str(p)], check=False)
+    m = re.search(r"^Identifier=(.+)$", r.stdout, re.M)
+    return m.group(1).strip() if m else ""
+
+
+def compose_dr(official: str, ident: str) -> str:
+    """把官方那條 requirement 和「我們自己」那條合成一條 designated requirement。
+
+    ident 綁死右支，缺它不可：只有 `!(anchor apple generic)` 的話，**任何**不是
+    Apple 錨定的程式碼都會滿足這條 DR，Squirrel 就等於完全不驗更新了。呼叫端
+    保證 ident 非空（見 official_dr）。
+    """
+    assert ident, "compose_dr 需要 bundle identifier，否則右支形同不設防"
+    return (f'designated => ({official}) or '
+            f'(identifier "{ident}" and !(anchor apple generic))')
+
+
+def official_dr(app: Path) -> tuple[str, Path] | tuple[None, None]:
+    """在磁碟上找一個官方簽章的 Claude，回傳 (要宣告的 DR 原文, 讀到它的路徑)。
+
+    順序：先看 app 自己（官方更新之後、還沒套繁中時就是這個情形），再看
+    Claude.backup-before-zhTW-* 由新到舊。找不到就回 (None, None)——
+    呼叫端會照舊簽（隱含 cdhash DR），只是自動更新維持現在的壞掉狀態。
+
+    右支的 identifier 從**同一個 bundle** 取，優先用左支自己那句
+    `identifier "..."`（同一串字，不可能漂移），沒有才退回讀它的簽章識別碼。
+    兩者都取不到就不宣告 —— 沒有 identifier 的右支等於不設防，寧可放棄這個
+    功能，也不會偷偷改成別的取捨。
+    """
+    cands = [app]
+    with contextlib.suppress(OSError):
+        cands += sorted((p for p in app.parent.glob(BACKUP_PREFIX + "*.app")
+                         if p.is_dir()), reverse=True)
+    for c in cands:
+        req = designated_requirement(c)
+        if not is_official_dr(req):
+            continue
+        m = re.search(r'identifier\s+"([^"]+)"', req)
+        ident = m.group(1) if m else code_identifier(c)
+        if not ident:
+            print(f"  ⚠ {c.name} 的 DR 沒有 identifier，也讀不到簽章識別碼 —— 略過")
+            continue
+        return compose_dr(req, ident), c
+    return None, None
+
+
+def resign(app: Path, dr: str | None = None):
+    """整包 ad-hoc 重簽。dr 有值時，**只有最外層 bundle** 帶上這條 DR。
+
+    為什麼只有最外層：
+      * Squirrel 走 SecCodeCopySelf，取的是主程序、也就是最外層 bundle 的簽章。
+        巢狀的 helper 與 framework 它從來不看。
+      * codesign 簽外層時，會把每個巢狀項目**當下的 DR** 抄進外層的
+        _CodeSignature/CodeResources；之後 kSecCSCheckNestedCode 就是拿那份抄本
+        去驗巢狀項目。巢狀項目若也宣告 Anthropic 的 DR，它們自己（ad-hoc）滿足
+        不了，`codesign --verify --deep --strict` 當場就會失敗。
+      * 也就是說「只給最外層」不是保守選擇，是唯一可行的選擇。
+    """
+    tmpd = Path(tempfile.mkdtemp(prefix="zhtw-ent."))
+    reqf = None
+    if dr:
+        reqf = tmpd / "designated.req"
+        reqf.write_text(dr + "\n", "utf-8")
+    def sign(p: Path, force=False, req: Path | None = None):
+        ent = entitlements(p)
+        if ent or force:
+            ent = dict(ent)
+            for k in TEAM_BOUND: ent.pop(k, None)
+            ent["com.apple.security.cs.disable-library-validation"] = True
+        cmd = ["codesign", "--force", "--sign", "-", "--options", "runtime",
+               "--preserve-metadata=identifier,flags"]
+        if ent:
+            f = tmpd / (hashlib.sha1(str(p).encode()).hexdigest() + ".plist")
+            f.write_bytes(plistlib.dumps(ent)); cmd += ["--entitlements", str(f)]
+        # --preserve-metadata 沒有帶 requirements，所以這裡的 -r 不會被它蓋掉。
+        if req:
+            cmd += ["-r", str(req)]
+        sh(cmd + [str(p)])
+    files, bundles = [], []
+    for root, dirs, fs_ in os.walk(app / "Contents"):
+        rp = Path(root)
+        for d in dirs:
+            if (rp / d).suffix in {".app", ".framework"}: bundles.append(rp / d)
+        for f in fs_:
+            fp = rp / f
+            if fp.is_symlink() or not fp.is_file(): continue
+            if fp.suffix in {".dylib", ".node", ".so"} or os.access(fp, os.X_OK):
+                files.append(fp)
+    for p in sorted(files, key=lambda x: len(x.parts), reverse=True): sign(p)
+    for p in sorted(bundles, key=lambda x: len(x.parts), reverse=True): sign(p)
+    sign(app, force=True, req=reqf)
+    shutil.rmtree(tmpd, ignore_errors=True)
+
+
+# ── exec 探針 ────────────────────────────────────────────────────────────
+# 探針要證明的只有一件事：重簽過的執行檔不會在 exec 當下被 AMFI 直接 SIGKILL。
+# 舊版直接跑 `Claude --version`，但 --version 對 packaged app 沒有特殊意義：
+# Electron 照樣把 App 整個初始化到會碰 safeStorage 的地方，於是探針自己去要了
+# 一次登入鑰匙圈授權（svce="Claude Safe Storage"），使用者每次安裝要輸入兩次
+# 密碼。現在改成在探針子行程上設 PROBE_ENV，boot shim 一載入就寫收據並 exit(0)，
+# 完全不 require 原始 main。詳細理由與實測證據寫在 payload/zhtw-boot.js 早退區塊。
+PROBE_ENV = "ZHTW_EXEC_PROBE"       # 與 zhtw-boot.js 的 PROBE_ENV 對齊
+PROBE_OK = "ZHTW-PROBE-OK"          # 收據的第一個 token，同樣兩邊對齊
+
+
+def probe_or_die(app: Path) -> str:
+    """跑一次 exec 探針，沒過就 SystemExit（呼叫端保證此時還沒動到 /Applications）。
+
+    通過條件三項，缺一不可：
+      1. 不是被訊號殺掉 —— 這是探針存在的唯一理由（AMFI 在 exec 當下 SIGKILL）；
+      2. exit 0 —— shim 早退走的是 process.exit(0)，所以正常值是確定的 0；
+      3. 收據以 PROBE_OK 開頭 —— 證明我們的 boot shim 真的被載入並跑到早退點。
+    """
+    rc, receipt = exec_probe(app)
+    # subprocess 對「被訊號終結的子行程」回傳 -signum，所以 AMFI 的 SIGKILL 在
+    # 這裡是 -9，不是 137；137（=128+9）只有經過 shell 轉手才會出現。兩種都要認：
+    # 舊版只比 137，對 subprocess 直接生出的子行程根本接不住 AMFI。
+    if rc in (-signal.SIGKILL, 137):
+        raise SystemExit("暫存版本一啟動就被系統終止（AMFI）— 中止，未更動你的 App")
+    if rc < 0:
+        raise SystemExit(f"exec 探針被訊號 {-rc} 終結 — 中止，未更動你的 App")
+    if rc != 0:
+        raise SystemExit(f"exec 探針以 exit {rc} 結束（預期 0）— 中止，未更動你的 App")
+    # 收據只有 shim 的早退路徑會寫。行程活著卻沒有收據，代表我們的 shim 沒跑到
+    # （例如 asar 的 main 沒指到它），一樣中止，不動 /Applications。
+    if not receipt.startswith(PROBE_OK):
+        raise SystemExit("exec 探針沒收到 boot shim 的回報（收據："
+                         f"{receipt!r}）— 中止，未更動你的 App")
+    print(f"  exec 探針通過 (exit 0；{receipt})")
+    print("    只載入 boot shim 就結束，不初始化 App ⇒ 安裝過程不碰鑰匙圈")
+    return receipt
+
+
+def exec_probe(app: Path) -> tuple[int, str]:
+    """回傳 (returncode, 收據內容)。收據不存在時是空字串。
+
+    收據走檔案不走 stdout：Node 在 macOS 上對 pipe 的 process.stdout 是非同步
+    寫入，process.exit() 會丟掉還沒沖出去的位元組。
+    """
+    with tempfile.TemporaryDirectory(prefix="zhtw-probe.") as d:
+        receipt = Path(d) / "receipt"
+        env = dict(os.environ)
+        env[PROBE_ENV] = str(receipt)
+        r = subprocess.run([str(app / CLAUDE_BIN_REL), "--version"],
+                           capture_output=True, timeout=90, env=env)
+        try:
+            got = receipt.read_text("utf-8", errors="replace").strip()
+        except OSError:
+            got = ""
+    return r.returncode, got
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# 執行期驗證
+#
+# exec 探針（--version）只證明行程沒被 AMFI 殺掉，它**不會建立 renderer**，
+# 所以「畫面全黑」這一類失敗它完全抓不到 —— 上一版就是這樣把黑畫面裝進去的。
+# 這裡改成真的把 App 開起來，等 boot shim 從頁面內回報
+# document.body.innerText.length 與可見元素數；拿不到證據就自動回滾。
+# ─────────────────────────────────────────────────────────────────────────
+
+def claude_pids() -> list[int]:
+    """Claude 是否在跑。
+
+    不能用 pgrep -f：它比對 KERN_PROCARGS2 的 argv，而 Claude 主程序的 argv
+    讀不到，所以 pgrep 對主程序完全失明（helper 命中、主程序漏掉）。實測：
+        ps aux                  -> 53875 /Applications/Claude.app/Contents/MacOS/Claude
+        pgrep -f <完整路徑>      -> 零命中
+        pgrep -f "Claude.app"   -> 14 個 helper，仍然沒有 53875
+        ps -axo pid=,comm=      -> 53875          <- 唯一有效
+    ps 的 comm 走核心裡的執行檔路徑，不受 argv 可讀性影響。
+    任何位於 bundle 內的程序（主程序或 helper）活著都代表 Claude 在跑。
+    """
+    prefix = str(APP) + "/"
+    r = subprocess.run(["ps", "-axo", "pid=,comm="], capture_output=True, text=True)
+    out = []
+    for line in r.stdout.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        pid, _, comm = line.partition(" ")
+        if pid.isdigit() and comm.strip().startswith(prefix):
+            out.append(int(pid))
+    return out
+
+
+def claude_main_pids() -> list[int]:
+    """只回主程序（comm 剛好等於 bundle 的主執行檔）。
+
+    等待「Claude 結束」時只盯主程序：helper 在一次工作階段裡本來就會生生滅滅，
+    盯它們會被吵醒很多次；而 helper 是主程序的子行程，主程序一走它們必然跟著走。
+    claude_pids() 仍然是「是否在跑」的唯一判準，這裡不取代它。
+    """
+    target = str(APP / CLAUDE_BIN_REL)
+    r = subprocess.run(["ps", "-axo", "pid=,comm="], capture_output=True, text=True)
+    out = []
+    for line in r.stdout.splitlines():
+        pid, _, comm = line.strip().partition(" ")
+        if pid.isdigit() and comm.strip() == target:
+            out.append(int(pid))
+    return out
+
+
+def wait_for_exit(pids, timeout: float) -> bool:
+    """阻塞等這些 pid 全部結束；True = 都結束了，False = 逾時。
+
+    用 kqueue 的 EVFILT_PROC / NOTE_EXIT。這是真正的事件等待：核心在目標行程
+    結束時才叫醒我們，等待期間這支行程完全阻塞、不佔 CPU、不做任何輪詢。
+    註冊一個已經結束的 pid 會直接得到 ESRCH（ProcessLookupError），所以
+    「檢查完到註冊之間對方就退出了」這個競態是安全的 —— 那個 pid 直接當成已結束。
+    實測（本機）：非子行程、同 uid、hardened runtime 的 Claude 主程序都註冊得上。
+    """
+    remaining = set()
+    kq = select.kqueue()
+    try:
+        for pid in pids:
+            try:
+                kq.control([select.kevent(pid, filter=select.KQ_FILTER_PROC,
+                                          flags=select.KQ_EV_ADD | select.KQ_EV_ENABLE,
+                                          fflags=select.KQ_NOTE_EXIT)], 0, 0)
+                remaining.add(pid)
+            except ProcessLookupError:
+                pass                      # 註冊前就已經結束
+            except OSError:
+                return False              # 註冊不上：交還給呼叫端，別假裝等到了
+        deadline = time.time() + timeout
+        while remaining:
+            left = deadline - time.time()
+            if left <= 0:
+                return False
+            evs = kq.control(None, len(remaining), left)
+            if not evs:
+                return False              # 逾時
+            for e in evs:
+                remaining.discard(e.ident)
+        return True
+    finally:
+        kq.close()
+
+
+def online(host="claude.ai", port=443, timeout=8) -> bool:
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except OSError:
+        return False
+
+
+def _read_from(p: Path, off: int) -> str:
+    if not p.is_file():
+        return ""
+    with p.open("rb") as f:
+        f.seek(off)
+        return f.read().decode("utf-8", "replace")
+
+
+def _stop(proc: subprocess.Popen):
+    """先禮貌關閉整個行程群組，再確認 helper 也收乾淨。"""
+    for sig in (signal.SIGTERM, signal.SIGKILL):
+        if proc.poll() is not None:
+            break
+        try:
+            os.killpg(os.getpgid(proc.pid), sig)
+        except (ProcessLookupError, PermissionError):
+            try:
+                proc.send_signal(sig)
+            except ProcessLookupError:
+                break
+        try:
+            proc.wait(timeout=15)
+        except subprocess.TimeoutExpired:
+            continue
+    for _ in range(20):
+        if not claude_pids():
+            return
+        time.sleep(1)
+    # pkill -f 同樣看不見主程序（見 claude_pids 的說明），改用實際偵測到的 pid。
+    for pid in claude_pids():
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except OSError:
+            pass
+    time.sleep(2)
+
+
+def launch_and_watch(label: str, timeout: int = 300) -> dict:
+    """啟動 App，盯 boot.log 等心跳。回傳觀察到的標記。"""
+    off = BOOTLOG.stat().st_size if BOOTLOG.is_file() else 0
+    print(f"  [{label}] 啟動 App，等待 renderer 回報畫面狀態（上限 {timeout}s）…")
+    proc = subprocess.Popen([str(APP / CLAUDE_BIN_REL)],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                            start_new_session=True)
+    seen, tail = {}, ""
+    t0 = time.time()
+    try:
+        while time.time() - t0 < timeout:
+            time.sleep(1.0)
+            tail = _read_from(BOOTLOG, off)
+            for tag in (TAG_HEALTHY, TAG_PATCHED, TAG_DISCOVER, TAG_INLINE, TAG_SCRIPTFAIL,
+                        TAG_BOOTFAIL, TAG_DISARM, TAG_RELOADED):
+                if tag in tail:
+                    seen[tag] = True
+            if TAG_SCRIPTFAIL in seen or TAG_BOOTFAIL in seen or TAG_RELOADED in seen:
+                break
+            if TAG_HEALTHY in seen:
+                # 心跳到了還要多看幾秒，讓晚到的模組錯誤有機會浮現
+                time.sleep(6)
+                tail = _read_from(BOOTLOG, off)
+                if TAG_SCRIPTFAIL in tail:
+                    seen[TAG_SCRIPTFAIL] = True
+                if TAG_BOOTFAIL in tail:
+                    seen[TAG_BOOTFAIL] = True
+                break
+            if proc.poll() is not None and time.time() - t0 > 15 and not tail.strip():
+                print(f"  [{label}] App 在寫出任何記錄之前就結束了")
+                break
+    finally:
+        _stop(proc)
+    out = {"label": label, "seen": seen, "elapsed": round(time.time() - t0, 1),
+           "tail": tail}
+    hb = [l for l in tail.splitlines() if "ZHTW-HEARTBEAT" in l]
+    out["last_heartbeat"] = hb[-1].strip() if hb else None
+    for l in tail.splitlines():
+        if TAG_HEALTHY in l or TAG_SCRIPTFAIL in l or TAG_BOOTFAIL in l:
+            print("    " + l.strip())
+    if out["last_heartbeat"] and TAG_HEALTHY not in seen:
+        print("    最後一次心跳: " + out["last_heartbeat"])
+    return out
+
+
+def rollback(backup: Path, why: str):
+    print(f"\n  !! 執行期驗證未通過：{why}")
+    print("  !! 自動回滾到官方備份 —— 你的 Claude 會恢復成安裝前的樣子。")
+    # 記下「這個 Claude 版本套用失敗」。背景自動重試已經整支移除，所以這不再是
+    # 防迴圈裝置，而是給使用者看的紀錄：status 會顯示它，adapt 會在動手前把它
+    # 講出來。它不擋任何使用者明確要求的動作 —— 擋掉使用者自己下的指令是錯的。
+    record_failure(why)
+    dead = Path(tempfile.mkdtemp(prefix="zhtw-failed.")) / "Claude.app"
+    if APP.exists():
+        shutil.move(str(APP), str(dead))
+    shutil.move(str(backup), str(APP))
+    set_locale("en-US")
+    if STATE.is_file():
+        STATE.unlink()
+    for p in (CACHE_META, CACHE_BODY, HEALTH_F):
+        if p.is_file():
+            shutil.move(str(p), str(p) + ".bak")
+    print(f"  已還原 {backup.name} -> {APP}；語言設回 en-US")
+    print(f"  失敗的版本留在 {dead}（確認不需要後可自行刪除）")
+
+
+def verify_runtime(backup: Path | None) -> bool:
+    """安裝後的執行期把關。回滾條件：拿不到「畫面非空」的證據，或拿到直接證據
+    顯示我們的改寫把畫面弄壞了。
+
+    仍然跑兩輪，但兩輪測的東西和舊版不同 —— shim 現在會就地探測，第 1 輪就會
+    套用改寫（見 shim 檔頭）：
+      第 1 輪 —— 全新狀態（沒有磁碟快取）：就地探測 + 套用，App 必須完全正常
+      第 2 輪 —— 穩態（命中磁碟快取）：改寫過的 chunk 再被供應一次，仍須正常
+    兩輪都在測「上一版造成黑畫面」的那條路徑，第 1 輪多測了就地探測本身。
+
+    TAG_RELOADED 必須和 TAG_SCRIPTFAIL 同等對待：shim 的自我修復會在畫面壞掉時
+    自行退回英文並重載，之後照樣會寫出 TAG_HEALTHY。只看 TAG_HEALTHY 的話，
+    壞掉的改寫會被判成通過。
+    """
+    r1 = launch_and_watch("第 1 輪 / 首次套用", 300)
+    if TAG_SCRIPTFAIL in r1["seen"]:
+        if backup:
+            rollback(backup, "第 1 輪出現 " + TAG_SCRIPTFAIL + "（我們改寫的資源載入失敗）")
+        return False
+    if TAG_RELOADED in r1["seen"]:
+        if backup:
+            rollback(backup, "第 1 輪出現 " + TAG_RELOADED
+                             + "（畫面在窗口內沒有回報健康，shim 已自行退回英文並重載）")
+        return False
+    if TAG_BOOTFAIL in r1["seen"]:
+        if backup:
+            rollback(backup, "第 1 輪出現 " + TAG_BOOTFAIL
+                             + "（bootstrap 改寫失敗；若放著不管，選繁體中文會讓大量字串變空白）")
+        return False
+    if TAG_HEALTHY not in r1["seen"]:
+        if backup:
+            rollback(backup, f"第 1 輪 {r1['elapsed']}s 內沒有收到 {TAG_HEALTHY}（畫面可能是空的）")
+        return False
+    # 就地探測是新流程的正常路徑，它記的是 TAG_INLINE；只認 TAG_DISCOVER 的話
+    # 這個訊息在一般安裝下永遠不會出現。
+    found = TAG_INLINE in r1["seen"] or TAG_DISCOVER in r1["seen"]
+    print(f"  [第 1 輪] 通過（{r1['elapsed']}s）"
+          + ("；已找到 locale 白名單 chunk" if found else ""))
+
+    if not CACHE_META.is_file():
+        print("\n  ⚠ 沒有找到 locale 白名單 chunk（discovery 未命中）。")
+        print("    App 完全可用，但語言選單不會出現「繁體中文」，介面會是英文。")
+        print("    可能原因：Claude 改版後陣列形狀變了，或第 1 輪還沒載到那支 chunk。")
+        print("    先讓 App 正常用一陣子，再執行  patch-claude verify  重試。")
+        return True
+
+    r2 = launch_and_watch("第 2 輪 / 快取套用", 300)
+    if TAG_SCRIPTFAIL in r2["seen"]:
+        if backup:
+            rollback(backup, "第 2 輪出現 " + TAG_SCRIPTFAIL + "（改寫過的 chunk 載入失敗）")
+        return False
+    if TAG_RELOADED in r2["seen"]:
+        if backup:
+            rollback(backup, "第 2 輪出現 " + TAG_RELOADED
+                             + "（畫面在窗口內沒有回報健康，shim 已自行退回英文並重載）")
+        return False
+    if TAG_BOOTFAIL in r2["seen"]:
+        if backup:
+            rollback(backup, "第 2 輪出現 " + TAG_BOOTFAIL
+                             + "（bootstrap 改寫失敗；若放著不管，選繁體中文會讓大量字串變空白）")
+        return False
+    if TAG_HEALTHY not in r2["seen"]:
+        if backup:
+            rollback(backup, f"第 2 輪 {r2['elapsed']}s 內沒有收到 {TAG_HEALTHY}"
+                             "（改寫過的 chunk 很可能讓畫面變空）")
+        return False
+    if TAG_PATCHED not in r2["seen"]:
+        print("\n  ⚠ 第 2 輪畫面正常，但改寫過的 chunk 沒有被供應。")
+        print("    App 完全可用，介面會是英文。再開一次 App 通常就會生效。")
+        return True
+    print(f"  [第 2 輪] 通過（{r2['elapsed']}s）；改寫過的 chunk 已供應，畫面非空")
+    return True
+
+
+def set_locale(loc):
+    p = HOME / "Library/Application Support/Claude/config.json"
+    cfg = {}
+    if p.is_file():
+        try: cfg = json.loads(p.read_text("utf-8"))
+        except Exception: pass
+    cfg["locale"] = loc
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(cfg, ensure_ascii=False, indent=2) + "\n", "utf-8")
+
+
+def install(dry=False, verify=False, agent=True):
+    """預設路徑：確認沒在跑 -> 暫存區重建 -> exec 探針 -> 換進 /Applications -> 結束。
+
+    **不啟動 App**。安裝器自行開關 Claude 兩次這件事本身就是一種侵入感，而它擋下
+    的東西已經被別處接手：不能啟動的 bundle 由 exec 探針在動 /Applications 之前
+    擋掉；renderer 壞掉由 shim 的執行期自我修復接手（90 秒窗口內沒有健康心跳就
+    解除全部改寫並重載一次，退回英文但可用）。舊行為保留在 --verify 底下。
+    """
+    if not APP.is_dir(): raise SystemExit(f"找不到 {APP}")
+    if not TM_PATH.is_file(): raise SystemExit(f"找不到翻譯記憶 {TM_PATH}")
+    if not dry:
+        pids = claude_pids()
+        if pids:
+            raise SystemExit(f"Claude 正在執行（pid {', '.join(map(str, pids))}）。"
+                             "請先完全結束 Claude 再安裝 —— 安裝會替換整個 App。")
+        if verify and not online():
+            raise SystemExit("連不上 claude.ai:443。--verify 的執行期驗證需要網路才有"
+                             "意義，因此中止，未更動你的 App。\n"
+                             "（不加 --verify 就是預設的不啟動安裝，離線可用。）")
+    # 官方 DR 要在動任何東西之前先讀出來：來源是磁碟上還帶著 Anthropic 憑證簽章
+    # 的 bundle（APP 自己，或最新的備份）。抄進我們的簽章之後，Squirrel 的更新
+    # 驗證才會對官方更新成立 —— 理由與限制寫在 resign() 上方。
+    dr, dr_src = official_dr(APP)
+    if dr:
+        print(f"  官方 designated requirement 取自 {dr_src.name}")
+        print(f"    {dr}")
+        print("    宣告它之後，內建自動更新驗證官方更新才會通過")
+    else:
+        print("  ⚠ 磁碟上找不到官方簽章的 Claude（APP 與所有備份都是 ad-hoc）")
+        print("    這次照舊簽 —— 內建自動更新會維持無法安裝，只能從官網下載 DMG")
+    tmp = Path(tempfile.mkdtemp(prefix="zhtw-app."))
+    staged = tmp / "Claude.app"
+    print(f"  複製到暫存區 {staged}")
+    sh(["ditto", str(APP), str(staged)])
+    stats, src = build_catalogs(staged, staged / "Contents/Resources/zhtw")
+    for k, (h, n) in stats.items():
+        if n:
+            print(f"  {k:8s}: {h}/{n} 已翻譯 ({100*h/n:.1f}%)   來源: {src}")
+        else:
+            print(f"  {k:8s}: {h} 條")
+    orig, digest, nplist = patch_asar(staged)
+    print(f"  asar: main {orig} -> zhtw-boot.js")
+    print(f"  完整性雜湊已同步到 {nplist} 份 Info.plist")
+    resign(staged, dr)
+    sh(["xattr", "-dr", "com.apple.quarantine", str(staged)], check=False)
+    v = sh(["codesign", "--verify", "--deep", "--strict", str(staged)], check=False)
+    if v.returncode: raise SystemExit(f"簽章驗證失敗:\n{v.stdout}")
+    print("  簽章驗證通過")
+    # 宣告落進簽章之後，驗的是**兩個性質**，不是字串相等 —— codesign 會把
+    # 括號與註解正規化掉（`!(anchor apple generic)` 讀回來是 `! anchor apple
+    # generic`），比字串只會比出假警報。這兩條才是我們真正買到的東西：
+    if dr:
+        got = designated_requirement(staged)
+        if not got:
+            raise SystemExit("讀不回 designated requirement — 中止，未更動你的 App")
+        reqf = tmp / "declared.req"
+        reqf.write_text(got + "\n", "utf-8")
+        # (1) 官方簽章的 bundle 滿足它 ⇒ Squirrel 驗官方更新會過（更新裝得上）
+        off = sh(["codesign", "--verify", "-R", str(reqf), str(dr_src)], check=False)
+        # (2) 我們自己也滿足它 ⇒ 鑰匙圈「永遠允許」記下這條之後，下次啟動仍然
+        #     成立（macOS 記的就是這條 DR，見 resign() 上方）
+        own = sh(["codesign", "--verify", "-R", str(reqf), str(staged)], check=False)
+        if off.returncode or own.returncode:
+            raise SystemExit(
+                "designated requirement 沒有同時滿足兩個必要性質 — 中止，未更動你的 App\n"
+                f"  宣告的是: {got}\n"
+                f"  官方 bundle（{dr_src.name}）滿足它: "
+                f"{'是' if not off.returncode else '否 — 內建更新會裝不上'}\n"
+                f"  重簽後的 bundle 自己滿足它: "
+                f"{'是' if not own.returncode else '否 — 鑰匙圈授權會存不住'}")
+        print("  designated requirement 已寫入，兩個性質都驗過：")
+        print(f"    官方 bundle 滿足它 ⇒ 內建更新驗得過")
+        print(f"    自己也滿足它     ⇒ 鑰匙圈「永遠允許」存得住")
+    probe_or_die(staged)
+    if dry:
+        print(f"  [試跑] 暫存版本保留於 {staged}；/Applications 未更動")
+        return
+    # 打包＋簽章要好幾分鐘，開頭那次 pid 檢查早就過期了。背景由 LaunchAgent 觸發時
+    # 使用者隨時可能自己開 Claude，這裡再確認一次，絕不把執行中 App 的 bundle 換掉。
+    pids = claude_pids()
+    if pids:
+        raise SystemExit(f"安裝期間 Claude 被啟動（pid {', '.join(map(str, pids))}）。"
+                         "為避免替換執行中的 App，已中止；/Applications 未更動。")
+    backup = APP.parent / (BACKUP_PREFIX + dt.datetime.now().strftime("%Y%m%d-%H%M%S") + ".app")
+    shutil.move(str(APP), str(backup))
+    try:
+        shutil.move(str(staged), str(APP))
+    except Exception:
+        shutil.move(str(backup), str(APP)); raise
+    set_locale(LOCALE)
+    ver, build = app_versions(APP)
+    # claude_build 是 reapply_reason() 的比對依據之一：記下「這次套用的是哪個 build」，
+    # 之後 LaunchAgent 才能只憑 Info.plist 就判斷不必再做事。
+    STATE.write_text(json.dumps({
+        "claude_version": ver, "claude_build": build,
+        "installed_at": dt.datetime.now().isoformat(timespec="seconds"),
+        "backup": backup.name, "locale": LOCALE}, indent=1), "utf-8")
+    print(f"  備份: {backup}")
+
+    # 健康計數屬於上一版 App，重置；但 **chunk 快取不能清**。
+    #
+    # 快取是以「線上 chunk 的網址」為鍵，而重裝本機 App 完全不影響線上前端 ——
+    # 清掉等於每次安裝後的第一次啟動都沒有快取可用，只能靠現場探測；而所有
+    # chunk 幾乎同時被請求、同時只准壓住一個，探到的多半不是目標，於是退回英文。
+    # 清掉的後果是每次安裝後的第一次啟動都看不到繁體中文。
+    #
+    # 改寫語意變更時的失效由 shim 的 pv 欄位負責（meta.pv !== PATCH_VERSION
+    # 就忽略快取重新探測），不需要在這裡粗暴地整個丟掉。
+    if HEALTH_F.is_file():
+        shutil.move(str(HEALTH_F), str(HEALTH_F) + ".bak")
+
+    if verify:
+        print("\n  執行期驗證（--verify）—— 會自動開關 Claude 兩次，請不要手動操作它")
+        if not verify_runtime(backup):
+            raise SystemExit("安裝失敗：已回滾，你的 Claude 是官方版本且可正常使用。")
+    clear_failure()
+    # 套上去了，先前那筆「等你確認」就過期了。
+    clear_pending()
+    # 只留最新一份備份。較舊的備份對應更早的 Claude 版本，還原它等於降級，
+    # 沒有保留價值；每份 800 MB，不清會一路堆下去。
+    for stale_bk in sorted(APP.parent.glob(BACKUP_PREFIX + "*.app"))[:-1]:
+        shutil.rmtree(stale_bk, ignore_errors=True)
+        print(f"  · 已清除較舊的備份 {stale_bk.name}")
+    if agent:
+        agent_install()
+    # 這一步會停下來問使用者密碼，所以必須排在所有非互動步驟**之後**，而且不准
+    # 讓它的失敗影響安裝結果。曾經放在 agent_install() 前面：使用者在密碼提示
+    # 那裡關掉視窗，偵測服務就整段沒裝上，而且毫無錯誤訊息 —— 之後 Claude 更新
+    # 時不會通知，使用者只會發現繁中無聲無息地消失了。
+    try:
+        refresh_keychain_partition()
+    except KeyboardInterrupt:
+        print("\n  · 已略過金鑰 partition 更新（你中斷了輸入）。")
+        print("    Claude 可能會要求重新登入。補做方式見 status 的提示。")
+    except Exception as e:
+        print(f"  ⚠ 金鑰 partition 更新出錯（{e}）；安裝本身已完成。")
+    print(f"\n  完成；語言已設為 {LOCALE}（顯示為「{DISPLAY}」）")
+    if not verify:
+        print("  安裝過程沒有啟動 Claude —— 請自己打開它（第一次啟動會跳鑰匙圈授權）。")
+    print(f"  備份保留於 {backup}；要還原就執行  patch-claude uninstall")
+
+
+
+def sync():
+    """列出 Claude 目前需要、但翻譯記憶裡還沒有的英文字串。"""
+    tm = json.loads(TM_PATH.read_text("utf-8"))
+    en2zh = {v["en"]: v["zh"] for v in tm.values() if isinstance(v.get("zh"), str)}
+    en2zh_n = {norm(k): v for k, v in en2zh.items()}
+    main_en, dyn_en, src = source_catalogs(APP)
+    shell_en = json.loads((APP / "Contents/Resources/en-US.json").read_text("utf-8"))
+    pending, total = {}, 0
+    for label, cat in (("main", main_en), ("dynamic", dyn_en), ("shell", shell_en)):
+        miss = {k: v for k, v in cat.items()
+                if isinstance(v, str) and v.strip()
+                and not (en2zh.get(v) or en2zh_n.get(norm(v)))}
+        total += len(cat)
+        if miss:
+            pending[label] = miss
+        print(f"  {label:8s}: {len(cat) - len(miss)}/{len(cat)} 已翻譯，缺 {len(miss)}")
+    n = sum(len(v) for v in pending.values())
+    print(f"  來源    : {src}")
+    out = PROJ / "pending.json"
+    out.write_text(json.dumps(pending, ensure_ascii=False, indent=1), "utf-8")
+    print(f"  待翻譯  : {n} 條 -> {out}")
+    if n:
+        print("  補完方式: 翻譯 pending.json 的值，存成 {英文: 中文} 的 JSON，")
+        print("            再執行  patch-claude merge <你的檔案>  併入翻譯記憶")
+    return n
+
+
+def merge(src_file):
+    """把 {英文: 中文} 的 JSON 併入翻譯記憶。"""
+    import hashlib as _h
+    add = json.loads(Path(src_file).read_text("utf-8"))
+    tm = json.loads(TM_PATH.read_text("utf-8"))
+    n = 0
+    for en, zh in add.items():
+        if not isinstance(zh, str) or not zh.strip():
+            continue
+        k = _h.sha1(norm(en).encode()).hexdigest()
+        tm[k] = {"en": en, "zh": zh, "src": "manual"}
+        n += 1
+    TM_PATH.write_text(json.dumps(tm, ensure_ascii=False, indent=1, sort_keys=True) + "\n", "utf-8")
+    print(f"  已併入 {n} 條，翻譯記憶共 {len(tm)} 條")
+    print("  接著執行 patch-claude install 讓它生效")
+
+
+def read_health() -> dict:
+    """shim 的執行期健康狀態。缺檔／毀損一律當成乾淨狀態。"""
+    if not HEALTH_F.is_file():
+        return {}
+    try:
+        d = json.loads(HEALTH_F.read_text("utf-8"))
+        return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def rearm():
+    """清掉 shim 的自我停用狀態與健康計數，讓下一次啟動重新啟用改寫。
+
+    shim 在「連續 DISARM_AT 次：頁面確實起跑後畫面仍不健康」時會自我停用，
+    並把 disarmed 寫進 health.json —— 那是持久狀態，不會自己消失（否則會在
+    「停用一次 -> 又武裝 -> 又壞掉」之間無限擺盪）。這支指令是明確的解除方式；
+    另一個解除點是 install，它本來就會把舊的 health.json 移成 .bak。
+    """
+    h = read_health()
+    fail = int(h.get("fail", 0) or 0)
+    if not h.get("disarmed") and not fail:
+        print("  改寫沒有被停用，健康計數也是 0 —— 不必做任何事。")
+        return 0
+    if h.get("disarmed"):
+        print(f"  目前狀態：已自我停用（{h.get('at', '?')}）")
+        print(f"            原因：{h.get('why', '?')}")
+    else:
+        print(f"  目前狀態：未停用，但健康計數 fail={fail}/{DISARM_AT}")
+    lf = h.get("lastFail")
+    if isinstance(lf, dict) and lf.get("why"):
+        print(f"            最後一次記錄：{lf.get('at', '?')} — {str(lf.get('why'))[:100]}")
+    HEALTH_F.write_text(json.dumps({"fail": 0}) + "\n", "utf-8")
+    print("  已清除。下一次啟動 Claude 會重新啟用繁體中文改寫。")
+    print("  （畫面若真的因為改寫而壞掉，shim 仍會自我修復、重新計數、必要時再停用）")
+    return 0
+
+
+def status():
+    pl = plistlib.loads((APP / "Contents/Info.plist").read_bytes())
+    sig = sh(["codesign", "-dv", str(APP)], check=False).stdout
+    # codesign 印的是 `TeamIdentifier=not set`（兩個字）或 `TeamIdentifier=<TEAM>`。
+    # 舊的 (\S+) 只吃到 "not"，於是沒有團隊識別碼時印成 `TeamIdentifier=not`。
+    team = re.search(r"^TeamIdentifier=(.+)$", sig, re.M)
+    _, files = asar.extract_all(str(APP / "Contents/Resources/app.asar"))
+    patched = json.loads(files["package.json"]).get("main") == "zhtw-boot.js"
+    print(f"Claude.app     : {pl.get('CFBundleShortVersionString')}")
+    tid = team.group(1).strip() if team else ""
+    print(f"簽章           : {'adhoc' if 'adhoc' in sig else 'Developer ID'} "
+          f"TeamIdentifier={tid if tid and tid != 'not set' else '未設定'}")
+    # 內建自動更新能不能動，取決於宣告的 DR 有沒有一支是憑證條件；鑰匙圈授權
+    # 存不存得住，取決於這個 bundle 自己滿不滿足同一條 DR。兩件事，分開報。
+    cur_dr = designated_requirement(APP)
+    print("內建自動更新   : " + ("可用（DR 有一支是官方憑證條件）" if is_cert_dr(cur_dr)
+                                else "不可用（DR 只綁 cdhash，官方更新驗不過）"))
+    if cur_dr:
+        with tempfile.NamedTemporaryFile("w", suffix=".req", delete=True) as f:
+            f.write(cur_dr + "\n"); f.flush()
+            own = sh(["codesign", "--verify", "-R", f.name, str(APP)], check=False)
+        print("鑰匙圈授權     : " + ("可存住（bundle 滿足自己宣告的 DR）"
+                                    if not own.returncode else
+                                    "存不住（bundle 不滿足自己宣告的 DR，每次啟動都會問）"))
+    print(f"已套用繁中     : {'是' if patched else '否'}")
+    print(f"翻譯資源       : {'有' if (APP/'Contents/Resources/zhtw/main.json').is_file() else '無'}")
+    print(f"外殼 {LOCALE:9s}: {'有' if (APP/'Contents/Resources'/f'{LOCALE}.json').is_file() else '無'}")
+    if STATE.is_file():
+        st = json.loads(STATE.read_text("utf-8"))
+        print(f"上次安裝       : {st.get('installed_at')} (Claude {st.get('claude_version')})")
+    bks = sorted(p.name for p in APP.parent.glob(BACKUP_PREFIX + "*.app"))
+    print(f"備份           : {len(bks)}" + (f"  最新={bks[-1]}" if bks else ""))
+    # 執行期狀態：這幾項才決定使用者實際看到中文還是英文
+    if CACHE_META.is_file():
+        try:
+            m = json.loads(CACHE_META.read_text("utf-8"))
+            stale = m.get("pv") != PATCH_VERSION
+            print(f"白名單 chunk   : 已鎖定 {m.get('url','?').split('/')[-1]}  ({m.get('at')})"
+                  + ("  ⚠ 舊版改寫語意，下次啟動會重新探測" if stale else ""))
+        except Exception:
+            print("白名單 chunk   : 快取毀損（下次啟動會自動重找）")
+    else:
+        print("白名單 chunk   : 尚未找到（介面會是英文；開一次 App 讓它去找）")
+    h = read_health()
+    fail = int(h.get("fail", 0) or 0)
+    if h.get("disarmed"):
+        print("改寫狀態       : ⚠ 已自我停用 —— 每次啟動都不改寫，介面會是英文")
+        print(f"                 停用於 {h.get('at', '?')}")
+        print(f"                 原因  ：{h.get('why', '?')}")
+        print("                 重新啟用：patch-claude rearm")
+    else:
+        tail = (f"  （再 {DISARM_AT - fail} 次「頁面起跑後不健康」就會自我停用）"
+                if fail else "")
+        print(f"改寫狀態       : 啟用中；健康計數 fail={fail}/{DISARM_AT}{tail}")
+    lf = h.get("lastFail")
+    if isinstance(lf, dict) and lf.get("why"):
+        print(f"  最後計入失敗 : {lf.get('at', '?')} — {str(lf.get('why'))[:90]}")
+    # 更新偵測：LaunchAgent 是否真的在監看，以及有沒有待確認的適配更新
+    if agent_loaded():
+        rc = agent_last_exit()
+        print(f"更新偵測 agent : 已載入 {AGENT_LABEL}"
+              + (f"  上次結束碼={rc}" if rc is not None else "")
+              + ("" if AGENT_PLIST.is_file() else "  ⚠ plist 已不存在"))
+    elif AGENT_PLIST.is_file():
+        print(f"更新偵測 agent : 未載入（plist 在 {AGENT_PLIST}）"
+              "  執行  patch-claude agent-install  重新載入")
+    else:
+        print("更新偵測 agent : 未安裝（Claude 更新後不會通知你）"
+              "  安裝：patch-claude agent-install")
+    if agent_loaded() or AGENT_PLIST.is_file():
+        pl_ = read_plist(AGENT_PLIST)
+        wp = pl_.get("WatchPaths") or []
+        print("  觸發方式     : " + ("；".join(f"WatchPaths {w}" for w in wp) or "（無）")
+              + "；RunAtLoad"
+              + ("  ⚠ 仍有 StartInterval=" + str(pl_["StartInterval"])
+                 if "StartInterval" in pl_ else "；無定時器（穩態不醒來）"))
+        args = pl_.get("ProgramArguments") or []
+        print("  它會做什麼   : " + ("只偵測並通知；不重套、不重簽章、不碰你的 App"
+                                     if args[-1:] == ["watch"] else
+                                     f"⚠ plist 指向 {(args[-1:] or ['?'])[0]!r}，不是 watch"
+                                     " —— 執行 patch-claude agent-install 換掉它"))
+    old = legacy_present()
+    if old:
+        print("  ⚠ 舊版殘留   : " + "、".join(old))
+        print("                 這些會在背景重簽章並跳鑰匙圈密碼框。"
+              "移除：patch-claude agent-install")
+    reason = reapply_reason()
+    prior = past_failure()
+    if reason is None and not STATE.is_file():
+        # reapply_reason() 對「從來沒套用過」也回 None（沒有東西被蓋掉），但那和
+        # 「套好了、無事可做」是兩件事，不能用同一句話講。
+        print("適配更新       : 不適用（這台機器還沒套用過繁體中文）")
+    elif reason is None:
+        print("適配更新       : 無須處理（bundle 已是套用過繁體中文的版本）")
+    else:
+        pend = pending_for_current()
+        print(f"適配更新       : 待確認 —— {reason}")
+        if pend:
+            print(f"                 偵測於 {pend.get('detected_at')}"
+                  + (f"，已通知 {pend.get('notified_at')}" if pend.get("notified")
+                     else "，通知未送出"))
+        print("                 補回繁體中文：patch-claude adapt"
+              "（會先問你，確認後才重簽章）")
+        print("                 不做也可以：Claude 維持英文，也不會被問密碼")
+    if prior:
+        print(f"  先前套用失敗 : {prior.get('at')} — {str(prior.get('why'))[:80]}")
+    if BOOTLOG.is_file():
+        lines = BOOTLOG.read_text("utf-8", "replace").splitlines()
+        for tag, label in ((TAG_HEALTHY, "最後心跳"), (TAG_PATCHED, "最後套用"),
+                           (TAG_SCRIPTFAIL, "最後載入失敗"), (TAG_BOOTFAIL, "最後 bootstrap 失敗"),
+                           (TAG_DISARM, "最後停用"), (TAG_RELOADED, "最後自我修復重載"),
+                           (TAG_REMOTE, "最後遠端改版"), (TAG_FAILCOUNT, "最後計數")):
+            hit = [l for l in lines if tag in l]
+            if hit:
+                print(f"{label:14s}: {hit[-1].strip()[:110]}")
+
+
+def verify_cmd():
+    """不重裝，只重跑一次執行期驗證（失敗會回滾到最新備份）。"""
+    if claude_pids():
+        raise SystemExit("Claude 正在執行，請先完全結束它再驗證。")
+    _, files = asar.extract_all(str(APP / "Contents/Resources/app.asar"))
+    if json.loads(files["package.json"]).get("main") != "zhtw-boot.js":
+        raise SystemExit("目前的 Claude.app 不是繁中版本，沒有東西可驗證。")
+    bks = sorted(APP.parent.glob(BACKUP_PREFIX + "*.app"))
+    if not bks:
+        print("  ⚠ 找不到備份 —— 驗證失敗時無法自動回滾，只會報告。")
+    ok = verify_runtime(bks[-1] if bks else None)
+    print("\n  驗證結果: " + ("通過" if ok else "未通過"))
+    return 0 if ok else 1
+
+
+def uninstall():
+    pids = claude_pids()
+    if pids:
+        raise SystemExit(f"Claude 正在執行（pid {', '.join(map(str, pids))}）。"
+                         "請先完全結束 Claude 再還原 —— 還原會替換整個 App。")
+    bks = sorted(APP.parent.glob(BACKUP_PREFIX + "*.app"))
+    if not bks: raise SystemExit("找不到備份；請到 claude.ai/download 重新安裝")
+    latest = bks[-1]
+    # 先拆掉 LaunchAgent。留著一個盯著官方版 App 的 agent，等於下次 Claude 更新時
+    # 會把使用者已經解除安裝的補丁再裝回去。
+    agent_uninstall(quiet=True)
+    clear_failure()
+    clear_pending()
+    stale = None
+    if APP.exists():
+        # 先挪開而不是直接刪 —— 萬一下一行的還原失敗，這份還能救回來。
+        stale = APP.parent / f"Claude.old-{dt.datetime.now():%Y%m%d-%H%M%S}.app"
+        shutil.move(str(APP), str(stale))
+    shutil.move(str(latest), str(APP))
+    # 還原已經成功，中間產物沒有保留價值。不刪的話每次安裝都在 /Applications
+    # 多堆一份 800 MB 的補丁版副本，使用者會看到一整排搞不清楚的 Claude。
+    if stale is not None and stale.exists():
+        shutil.rmtree(stale, ignore_errors=True)
+    set_locale("en-US")
+    if STATE.is_file(): STATE.unlink()
+    print(f"已還原 {latest.name}；語言設回 en-US")
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# 更新偵測 —— LaunchAgent 只偵測與通知，永遠不動手
+#
+# 這一節的形狀完全由一個代價決定：**每一次重簽章都要使用者付至少一次密碼。**
+# 登入鑰匙圈裡的 Claude Safe Storage（Electron safeStorage）透過兩道互相獨立
+# 的閘門綁在 bundle 的 cdhash 上 —— trusted-application ACL 存的 designated
+# requirement，以及 partition list 的 ACLAuthorizationPartitionID。ad-hoc 簽章
+# 兩道都只能綁 cdhash（理由見 README「Costs」），所以重簽 ⇒ cdhash 變 ⇒ 兩道
+# 同時失效 ⇒ macOS 跳密碼框，有時還連跳好幾次才把授權寫進去。
+#
+# 舊版讓這支 LaunchAgent 在背景直接跑 install，等於在使用者沒有預期、也無法
+# 預測的時刻要密碼。使用者接受「每次更新付一次密碼」，但只接受在他自己決定
+# 更新的時候付。因此：
+#
+#   **這支 LaunchAgent 永遠不會執行 install，永遠不會呼叫 codesign。**
+#
+# 它會做的事只有三件，全部唯讀或只寫自己的記錄：
+#   1. 讀 Info.plist 與兩個 stat，判斷 bundle 是不是已經被官方版整包換掉；
+#   2. 是的話，貼一則通知中心訊息（被動橫幅，可忽略、可在系統設定關掉），
+#      同一個 Claude build 最多一則；
+#   3. 寫下待處理標記，讓 patch-claude status 與桌面腳本後續講得出話。
+# 真正的重套要使用者明確確認 —— patch-claude adapt，或雙擊桌面的安裝腳本。
+#
+# 觸發來源仍然全是事件，沒有 StartInterval、沒有 KeepAlive、沒有輪詢：
+#   1. WatchPaths /Applications         —— 目錄項目變動。手動拖曳 DMG 安裝新版
+#      是「把整個 .app 換掉」，一定會動到這個目錄。/Applications 本身永遠不會
+#      被刪除，所以這個 kqueue 監看不會失效。
+#   2. WatchPaths .../Contents/Info.plist —— 補上「原地改寫 bundle 內容」的更新。
+#   3. RunAtLoad                        —— 每次登入跑一次。不是定時器，是登入事件。
+# 穩態下 reapply_reason() 回 None，watch() 立刻結束，一個位元組都不寫。
+#
+# 自我觸發迴圈隨著「不再動手」一起消失了：這支 agent 不會再改寫那 12 份
+# Info.plist，所以第 2 個來源不可能被自己打到。reapply_reason() 的兩層守衛仍然
+# 保留 —— 它便宜、唯讀，而且是判斷本身，不只是防迴圈。
+#
+# 延後等待器（com.nanshan.claude-zhtw.reapply.await-quit）已經整支移除。它唯一的
+# 用途是「Claude 開著時把背景重套延後到它結束」；背景重套不存在了，它就沒有東西
+# 可以延後。留著一個只會自我移除、卻永遠不會被架起來的元件，只是看起來像在幫忙。
+# ─────────────────────────────────────────────────────────────────────────
+
+def app_versions(app: Path):
+    pl = plistlib.loads((app / "Contents/Info.plist").read_bytes())
+    return pl.get("CFBundleShortVersionString"), pl.get("CFBundleVersion")
+
+
+def read_plist(p: Path) -> dict:
+    try:
+        return plistlib.loads(p.read_bytes())
+    except Exception:
+        return {}
+
+
+def read_json(p: Path, default):
+    try:
+        return json.loads(p.read_text("utf-8"))
+    except Exception:
+        return default
+
+
+def zhtw_present(app: Path) -> bool:
+    """我們加進 bundle 的檔案是否還在。任何形式的整包替換都會把它們一起帶走。"""
+    return (app / "Contents/Resources/zhtw/main.json").is_file() \
+       and (app / "Contents/Resources" / f"{LOCALE}.json").is_file()
+
+
+def reapply_reason(app: Path | None = None, state: Path | None = None):
+    """需要重新修補 bundle 的理由；None 表示無須處理。
+
+    **這支函式的定義域只有「磁碟上的 bundle」，而且只有它。** 它看不到、也不該
+    看到線上前端改版 —— 那是 boot shim 的事，而且線上改版重簽章毫無幫助
+    （見 payload/zhtw-boot.js 檔頭「這支 shim 永遠不會要求重新修補 bundle」）。
+    這裡回非 None 就代表「我們的注入已經不在 bundle 裡」，而那只有重簽章能修，
+    所以也就代表「一定要先問過使用者」。
+
+    刻意分成兩層，因為每次 bundle 變動與每次登入都會呼叫它：
+      第 1 層 —— 只讀 Info.plist 與兩個 stat。已套用且版本相符就直接結束，
+                 不碰 35MB 的 app.asar。
+      第 2 層 —— 只有「檔案還在但版本對不上 state.json」這種罕見情況才解析 asar，
+                 避免僅僅因為 state.json 過期就判成需要重套。
+    """
+    app = app or APP
+    state = state or STATE
+    if not (app / "Contents/Info.plist").is_file():
+        return None                       # App 不在（可能正被更新中）；下次觸發再看
+    if not state.is_file():
+        # 從來沒有套用過（或使用者已經明確 uninstall / 回滾過）⇒ 沒有東西「被蓋掉」。
+        # 少了這一條，一台從沒裝過的機器會被回報成「待確認的適配更新」，桌面腳本
+        # 也會把第一次安裝誤導成「Claude 更新了」。state.json 是唯一的「曾經套用」證據。
+        return None
+    ver, build = app_versions(app)
+    if not zhtw_present(app):
+        return f"繁中資源不存在（Claude {ver} 已還原成官方 bundle）"
+    st = read_json(state, {})
+    if st.get("claude_version") == ver and st.get("claude_build", build) == build:
+        return None
+    try:
+        _, files = asar.extract_all(str(app / "Contents/Resources/app.asar"))
+        if json.loads(files["package.json"]).get("main") == "zhtw-boot.js":
+            return None
+    except Exception as e:
+        return f"無法讀取 app.asar（{e}）"
+    return f"asar main 已還原成官方版本（Claude {ver}）"
+
+
+def record_failure(why: str):
+    ver, build = app_versions(APP) if (APP / "Contents/Info.plist").is_file() else (None, None)
+    FAILED_F.write_text(json.dumps(
+        {"claude_version": ver, "claude_build": build, "why": why,
+         "at": dt.datetime.now().isoformat(timespec="seconds")}, ensure_ascii=False, indent=1), "utf-8")
+
+
+KC_SERVICE = "Claude Safe Storage"
+KC_ACCOUNT = "Claude Key"
+ANTHROPIC_TEAM = "Q6L2SF6YDW"
+
+
+def refresh_keychain_partition() -> None:
+    """重簽之後把新的 cdhash 補進金鑰項目的 partition list。
+
+    金鑰存取要過兩道閘門。信任應用程式 ACL 記的是 designated requirement，
+    我們的 DR 是選言式的，補丁版重簽後仍然滿足 —— 那道自動過。但 partition
+    list 記的是 cdhash（securityd 的 partitionIdForProcess 只對 Apple 錨定的
+    程式碼發 teamid:，其餘一律 cdhash:），每次重簽都會失效。不補的話 Claude
+    讀不到金鑰，log 會出現 safeStorage not available，使用者隨機掉登入。
+    實測：只修 partition、不碰 ACL 就能恢復存取。
+
+    刻意不用 `security -k <密碼>`：那會讓密碼出現在 ps 的程序列表裡。改成讓
+    security 自己在終端機問，密碼由 Apple 的工具讀走，不經過這支程式。非互動
+    情境（launchd）沒有終端機可問，就跳過並印出指令讓使用者自己跑。
+    """
+    r = subprocess.run(["security", "find-generic-password",
+                        "-s", KC_SERVICE, "-a", KC_ACCOUNT],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        print("  · 尚未有 Claude 金鑰項目（還沒登入過），略過 partition 維護")
+        return
+
+    cd = ""
+    c = subprocess.run(["codesign", "-dvvv", str(APP)], capture_output=True, text=True)
+    for line in (c.stdout + c.stderr).splitlines():
+        if line.startswith("CDHash="):
+            cd = line[len("CDHash="):].strip()
+            break
+    if not cd:
+        print("  ⚠ 取不到 cdhash，略過 partition 維護")
+        return
+
+    cmd = ["security", "set-generic-password-partition-list",
+           "-s", KC_SERVICE, "-a", KC_ACCOUNT,
+           "-S", f"cdhash:{cd},teamid:{ANTHROPIC_TEAM}"]
+
+    if not sys.stdin.isatty():
+        print("  ⚠ 沒有終端機可輸入鑰匙圈密碼，略過 partition 維護。")
+        print("    Claude 會讀不到已存的登入狀態。請自己執行一次：")
+        print("      " + " ".join(shlex.quote(x) for x in cmd))
+        return
+
+    print("\n  更新金鑰存取權限 —— 接下來會問你的鑰匙圈密碼（就是 Mac 登入密碼）。")
+    print("  不做的話 Claude 讀不到已存的登入狀態，會要你重新登入。")
+    rc = subprocess.run(cmd).returncode
+    if rc == 0:
+        print(f"  ✓ 金鑰 partition 已更新（cdhash {cd[:16]}…）")
+    else:
+        print(f"  ⚠ partition 更新失敗（rc={rc}）。Claude 可能會要求重新登入。")
+        print("    要重試就執行： " + " ".join(shlex.quote(x) for x in cmd))
+
+
+def clear_failure():
+    if FAILED_F.is_file():
+        FAILED_F.unlink()
+
+
+def past_failure():
+    """「現在裝著的這個 Claude 版本，先前套用失敗過」的記錄，否則 None。
+
+    這只是給使用者看的警告。它不再擋任何自動路徑 —— 自動路徑已經不存在，
+    而擋掉一個使用者明確要求的動作是錯的。
+    """
+    rec = read_json(FAILED_F, None)
+    if not isinstance(rec, dict) or not (APP / "Contents/Info.plist").is_file():
+        return None
+    ver, build = app_versions(APP)
+    return rec if (rec.get("claude_version"), rec.get("claude_build")) == (ver, build) else None
+
+
+# ── 待處理標記 ───────────────────────────────────────────────────────────
+# 通知橫幅會自己消失，使用者也可能整個沒看到。標記是那則通知的持久對應物：
+# status 靠它回答「有沒有待處理的適配更新」，桌面腳本靠它決定要說什麼，
+# 而「同一個 build 只通知一次」也靠它 —— 沒有它，WatchPaths 在整包替換時打出
+# 的那一串事件、加上每次登入的 RunAtLoad，會變成連續騷擾。
+
+def read_pending() -> dict:
+    rec = read_json(PENDING_F, None)
+    return rec if isinstance(rec, dict) else {}
+
+
+def clear_pending():
+    if PENDING_F.is_file():
+        PENDING_F.unlink()
+
+
+def pending_for_current() -> dict:
+    """只有「標記記的就是現在裝著的這個 Claude build」才算數。
+    Claude 又更新了一次 ⇒ 舊標記自動失效 ⇒ 新版本會重新通知一次。"""
+    rec = read_pending()
+    if not rec or not (APP / "Contents/Info.plist").is_file():
+        return {}
+    ver, build = app_versions(APP)
+    return rec if (rec.get("claude_version"), rec.get("claude_build")) == (ver, build) else {}
+
+
+# ── 通知 ─────────────────────────────────────────────────────────────────
+NOTIFY_TITLE = "Claude 繁體中文"
+NOTIFY_MAX_TRIES = 3        # 送不出去時的重試上限，避免每次事件都白試一次
+
+
+def _osa_str(s) -> str:
+    return '"' + str(s).replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def notify(text: str, subtitle: str = "") -> bool:
+    """貼一則通知中心橫幅。回傳是否真的送出去了。
+
+    刻意是 display notification，不是 display dialog／display alert：
+      * 被動橫幅，會自己消失，使用者可以完全不理它；
+      * 不搶焦點、不擋任何東西、不需要按任何按鈕才能繼續用電腦；
+      * 使用者可以在「系統設定 → 通知」把它整個關掉（來源顯示為指令碼編輯器），
+        也可以用 patch-claude agent-uninstall 把偵測整個拆掉。
+    要讓橫幅掛在自己的名字底下，必須產一個 .app bundle 來當通知來源；為了一則
+    通知在使用者家目錄裡放一個未簽章的 app，會惹上 Gatekeeper，代價大於好處。
+    送不出去不算錯誤：待處理標記仍然寫著，status 與桌面腳本一樣講得出話。
+    """
+    script = "display notification " + _osa_str(text) + " with title " + _osa_str(NOTIFY_TITLE)
+    if subtitle:
+        script += " subtitle " + _osa_str(subtitle)
+    try:
+        # 用裸名走 PATH，和這支檔案裡其餘的系統工具（codesign / ditto /
+        # xattr / launchctl / ps）一致；launchd job 的 PATH 一定含 /usr/bin。
+        r = subprocess.run(["osascript", "-e", script],
+                           capture_output=True, text=True, timeout=30)
+    except Exception as e:
+        print(f"  通知送出失敗（{e}）")
+        return False
+    if r.returncode:
+        print(f"  通知送出失敗（osascript exit {r.returncode}："
+              f"{(r.stdout + r.stderr).strip()[:200]}）")
+        return False
+    return True
+
+
+def trim_log():
+    """記錄檔自己封頂，否則久了會無限長。"""
+    try:
+        if AGENT_LOG.is_file() and AGENT_LOG.stat().st_size > 512 * 1024:
+            keep = AGENT_LOG.read_text("utf-8", "replace").splitlines()[-200:]
+            AGENT_LOG.write_text("\n".join(keep) + "\n", "utf-8")
+    except OSError:
+        pass
+
+
+def watch(check=False, dry=False):
+    """LaunchAgent 的 job。唯讀偵測 + 最多一則通知。
+
+    這支函式**不會**呼叫 install、不會呼叫 codesign、不會動 /Applications 裡的
+    任何東西，也不會啟動或關閉 Claude。它能寫的只有 ZDIR 底下自己的兩個檔。
+
+      check=True  只報告，連標記與通知都不寫（給人在終端機看的）
+      dry=True    走完整個判斷，但把通知內容印出來而不是真的貼出去（給測試用）
+    """
+    def log(msg):
+        print(f"[{dt.datetime.now():%Y-%m-%d %H:%M:%S}] {msg}", flush=True)
+
+    trim_log()
+    reason = reapply_reason()
+    if reason is None:
+        # 穩態：bundle 還是我們套過的那一份。什麼都不做。
+        if pending_for_current():
+            clear_pending()          # 使用者已經自己補回來了，標記過期
+            log("bundle 已重新套用，待處理標記已清除")
+        elif check or dry:
+            log("無須處理：bundle 仍是已套用繁體中文的版本" if STATE.is_file()
+                else "無須處理：這台機器還沒套用過繁體中文，沒有東西被蓋掉")
+        return 0
+    ver, build = app_versions(APP)
+    if check:
+        log(f"需要適配更新：{reason}")
+        log("這支指令不會動任何東西；要重新套用請執行  patch-claude adapt")
+        return 0
+    prev = pending_for_current()
+    if prev.get("notified"):
+        log(f"已通知過（{prev.get('notified_at')}），不重複；{reason}")
+        return 0
+    tries = int(prev.get("notify_tries", 0) or 0)
+    rec = {"claude_version": ver, "claude_build": build, "reason": reason,
+           "detected_at": prev.get("detected_at")
+                          or dt.datetime.now().isoformat(timespec="seconds"),
+           "notified": False, "notified_at": None, "notify_tries": tries}
+    text = ("繁體中文需要重新適配。雙擊桌面「Claude 繁體中文」裡的"
+            "「安裝繁體中文.command」即可，會問一次密碼。不理它也沒關係，"
+            "Claude 會維持英文，一切照常。")
+    sub = f"Claude 已更新到 {ver}"
+    if tries >= NOTIFY_MAX_TRIES:
+        log(f"通知已連續 {tries} 次送不出去，不再嘗試；待處理標記留在 {PENDING_F}")
+        rec["notify_tries"] = tries
+        PENDING_F.write_text(json.dumps(rec, ensure_ascii=False, indent=1), "utf-8")
+        return 0
+    if dry:
+        print(f"  [dry-run] 通知標題：{NOTIFY_TITLE}")
+        print(f"  [dry-run] 通知副標：{sub}")
+        print(f"  [dry-run] 通知內文：{text}")
+        ok = True
+    else:
+        ok = notify(text, sub)
+    rec["notified"] = bool(ok)
+    rec["notify_tries"] = tries if ok else tries + 1
+    if ok:
+        rec["notified_at"] = dt.datetime.now().isoformat(timespec="seconds")
+    PENDING_F.write_text(json.dumps(rec, ensure_ascii=False, indent=1), "utf-8")
+    log(f"偵測到 Claude 已更新：{reason}")
+    log("已寫下待處理標記" + ("，並貼出通知" if ok else "；通知這次沒送出去"))
+    log("本 agent 不重套也不重簽章 —— 等使用者確認（patch-claude adapt）")
+    return 0
+
+
+def quit_claude(timeout: float = 90) -> bool:
+    """請 Claude 自己結束。呼叫端必須已經取得使用者的明確確認。
+
+    先送 AppleScript quit，再用 kqueue NOTE_EXIT 等它真的走完 —— 事件等待，
+    不輪詢。**不強制 kill**：使用者可能正停在某個「要不要儲存」上，硬殺是
+    破壞性的。等不到就回 False，呼叫端中止並保持 bundle 原封不動。
+    """
+    if not claude_pids():
+        return True
+    subprocess.run(["osascript", "-e", 'tell application "Claude" to quit'],
+                   capture_output=True)
+    main = claude_main_pids() or claude_pids()
+    if main:
+        wait_for_exit(main, timeout)
+    rest = claude_pids()
+    if rest:
+        wait_for_exit(rest, min(timeout, 30))
+    return not claude_pids()
+
+
+ADAPT_ASK = "  要現在重新適配嗎？[y/N] "
+
+
+def adapt(yes=False, dry=False):
+    """Claude 更新之後把繁體中文補回來。**必須有使用者的明確確認才會動手。**
+
+    確認是硬性的，不是禮貌：走完這條路一定要重簽章，而重簽章一定會讓 macOS 在
+    使用者下次打開 Claude 時要一次鑰匙圈密碼（見本節開頭）。所以：
+      * 沒有預設 yes，沒有逾時後自動繼續 —— 逾時繼續等於沒有確認；
+      * 不是互動式終端機（例如被 launchd 叫起來）就直接拒絕，除非命令列上
+        明明白白有 --yes，而打出 --yes 本身就是一次使用者動作；
+      * 取消是零副作用：/Applications 不動，codesign 不跑，標記不清。
+    """
+    reason = reapply_reason()
+    if reason is None:
+        print("  沒有待處理的適配更新 —— 目前的 Claude.app 已經是套用過繁體中文的版本。")
+        clear_pending()
+        return 0
+    ver, _build = app_versions(APP)
+    prior = past_failure()
+    running = bool(claude_pids())
+    print()
+    print(f"  Claude 已更新到 {ver}，原本的繁體中文被官方版整包蓋掉了。")
+    print(f"  偵測到的狀態：{reason}")
+    print()
+    print("  要補回來，必須重新修補並重新簽章。這會做這些事：")
+    if running:
+        print("    • 關掉你現在開著的 Claude（目前的視窗會結束）")
+    print("    • 替換 /Applications/Claude.app，原版備份在旁邊留一份")
+    print("    • 重新簽章 —— 你下次打開 Claude 時 macOS 會問一次鑰匙圈密碼")
+    print("      授權綁在簽章雜湊上，重簽就換一份，這是 macOS 的機制，繞不過")
+    if running:
+        print("    • 重新打開 Claude")
+    print()
+    print("  不做也完全可以：Claude 會維持英文，其他一切照常，也不會被問密碼。")
+    print("  之後任何時候想做，再執行一次這個指令就好。")
+    if prior:
+        print()
+        print(f"  ⚠ 這個版本先前套用失敗過（{prior.get('at')}）：{prior.get('why')}")
+    print()
+    if not yes:
+        if not sys.stdin.isatty():
+            print("  需要你明確確認才會動手，而現在不是互動式終端機。")
+            print("  請在終端機執行  patch-claude adapt ，或雙擊桌面的"
+                  "「安裝繁體中文.command」。")
+            print("  什麼都沒有被更動，也沒有呼叫過 codesign。")
+            return 2
+        try:
+            ans = input(ADAPT_ASK).strip()
+        except (EOFError, KeyboardInterrupt):
+            ans = ""
+            print()
+        if ans[:1].lower() != "y":
+            print("  已取消。/Applications 未更動，沒有重新簽章，Claude 維持英文。")
+            return 1
+    if dry:
+        print("  [dry-run] 確認通過。真正執行時會從這裡開始關閉 Claude、執行 install、"
+              "再把 Claude 打開。")
+        print("  [dry-run] /Applications 未更動，沒有呼叫 codesign。")
+        return 0
+    with single_run() as got:
+        if not got:
+            raise SystemExit("已有另一個適配更新正在執行，這次不重複。")
+        if running:
+            print("  → 結束 Claude（要替換整個 App，不能在執行中進行）")
+            if not quit_claude():
+                raise SystemExit("Claude 沒有回應結束要求，已中止；"
+                                 "/Applications 未更動，沒有重新簽章。")
+        try:
+            install(agent=True)
+            clear_pending()
+        finally:
+            # 我們是為了套用才把使用者的 Claude 關掉的。install 的最後一步
+            # （agent_install）就算失敗，也不能讓他的視窗就這樣消失不見 ——
+            # 此時 bundle 早就換好了，重新打開一定是對的。
+            if running:
+                print("  → 重新打開 Claude")
+                subprocess.run(["open", "-a", str(APP)], capture_output=True)
+        if not running:
+            print("  完成。請自己打開 Claude（第一次啟動會問一次鑰匙圈密碼）。")
+    return 0
+
+
+def legacy_agent_entry():
+    """舊 LaunchAgent（reapply / await-quit）的進入點。
+
+    舊 plist 可能還載入著，而它的 ProgramArguments 指向會執行 install 的
+    reapply。把這兩個名字導到唯讀的 watch，等於這支檔案一落地，還沒被換掉的
+    舊 agent 就從「背景重簽章」變成「只通知」—— 不必等使用者先跑 agent-install。
+    """
+    print(f"[{dt.datetime.now():%Y-%m-%d %H:%M:%S}] 舊版進入點：背景自動重套已移除"
+          "（每次重簽章都會讓 macOS 跟使用者要密碼），改為只偵測並通知。", flush=True)
+    print("  請執行  patch-claude agent-install  換上新的偵測用 agent。", flush=True)
+    return watch(check="--check" in sys.argv)
+
+
+@contextlib.contextmanager
+def single_run():
+    """同時只允許一個 adapt。flock 由行程結束自動釋放，不會留下死鎖檔。"""
+    AGENT_LOCK.parent.mkdir(parents=True, exist_ok=True)
+    fh = AGENT_LOCK.open("w")
+    try:
+        fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        fh.close()
+        yield False
+        return
+    try:
+        yield True
+    finally:
+        fcntl.flock(fh, fcntl.LOCK_UN)
+        fh.close()
+
+
+def agent_domain():
+    return f"gui/{os.getuid()}"
+
+
+def agent_plist_dict():
+    # 用 /usr/bin/python3 這個系統門面，不用 sys.executable —— 後者會解析成
+    # /Library/Developer/CommandLineTools/... 之類會被 Xcode/CLT 更新整包換掉的
+    # 實體路徑，而這支 agent 要活好幾年。
+    py = "/usr/bin/python3" if Path("/usr/bin/python3").is_file() else sys.executable
+    return {
+        "Label": AGENT_LABEL,
+        "ProgramArguments": [py, str(SELF), "watch"],
+        "WatchPaths": [str(APP.parent), str(APP / "Contents/Info.plist")],
+        # 刻意沒有 StartInterval、沒有 KeepAlive：穩態下這支 agent 一次都不會醒來。
+        # ThrottleInterval 只是把 bundle 被替換時爆出來的一串 kqueue 事件合併成一次。
+        "ThrottleInterval": AGENT_THROTTLE,
+        "RunAtLoad": True,
+        "StandardOutPath": str(AGENT_LOG),
+        "StandardErrorPath": str(AGENT_LOG),
+    }
+
+
+def label_loaded(label: str) -> bool:
+    return subprocess.run(["launchctl", "list", label], capture_output=True).returncode == 0
+
+
+def agent_loaded() -> bool:
+    return label_loaded(AGENT_LABEL)
+
+
+def agent_last_exit():
+    r = subprocess.run(["launchctl", "list", AGENT_LABEL], capture_output=True, text=True)
+    m = re.search(r'"LastExitStatus"\s*=\s*(-?\d+)', r.stdout)
+    return int(m.group(1)) if m else None
+
+
+def legacy_present() -> list:
+    """還躺著的舊版背景服務（載入中或 plist 還在）。"""
+    out = []
+    for lab in LEGACY_LABELS:
+        if label_loaded(lab) or (AGENT_DIR / f"{lab}.plist").is_file():
+            out.append(lab)
+    return out
+
+
+def legacy_cleanup(quiet=False):
+    """把舊版背景服務拆乾淨。
+
+    這一步是承重的，不是整潔：舊 agent 的 ProgramArguments 是會執行 install 的
+    reapply。只要它還載入著，Claude 一更新就會在背景重簽章，並在使用者完全沒有
+    預期的時刻跳出鑰匙圈密碼框 —— 正是這一版要消滅的行為。
+    """
+    for lab in legacy_present():
+        p = AGENT_DIR / f"{lab}.plist"
+        subprocess.run(["launchctl", "bootout", f"{agent_domain()}/{lab}"], capture_output=True)
+        if label_loaded(lab):
+            subprocess.run(["launchctl", "unload", "-w", str(p)], capture_output=True)
+        if p.is_file():
+            p.unlink()
+        if not quiet:
+            print(f"  已移除舊版背景服務：{lab}（它會在背景重簽章，本版不再使用）")
+
+
+def agent_install():
+    """安裝並載入偵測用 LaunchAgent（冪等；設定變更後重跑即可）。"""
+    legacy_cleanup()
+    AGENT_DIR.mkdir(parents=True, exist_ok=True)
+    AGENT_PLIST.write_bytes(plistlib.dumps(agent_plist_dict()))
+    subprocess.run(["launchctl", "bootout", f"{agent_domain()}/{AGENT_LABEL}"],
+                   capture_output=True)
+    r = subprocess.run(["launchctl", "bootstrap", agent_domain(), str(AGENT_PLIST)],
+                       capture_output=True, text=True)
+    if r.returncode:      # 舊系統沒有 bootstrap
+        r = subprocess.run(["launchctl", "load", "-w", str(AGENT_PLIST)],
+                           capture_output=True, text=True)
+    if r.returncode or not agent_loaded():
+        raise SystemExit(f"LaunchAgent 載入失敗（{r.returncode}）：{(r.stdout + r.stderr).strip()}\n"
+                         f"plist 已寫到 {AGENT_PLIST}")
+    print(f"  LaunchAgent 已載入：{AGENT_LABEL}")
+    print(f"    監看 {APP.parent} 與 {APP.name}/Contents/Info.plist；沒有定時器，"
+          "平常不會醒來")
+    print("    它只做一件事：Claude 被官方版換掉時貼一則通知。"
+          "不重套、不重簽章、不動你的 App")
+    print(f"    記錄檔 {AGENT_LOG}")
+
+
+def agent_uninstall(quiet=False):
+    """卸載並移除偵測用 LaunchAgent（連同任何舊版殘留）。"""
+    was = agent_loaded() or AGENT_PLIST.is_file() or bool(legacy_present())
+    legacy_cleanup(quiet=True)
+    subprocess.run(["launchctl", "bootout", f"{agent_domain()}/{AGENT_LABEL}"],
+                   capture_output=True)
+    if agent_loaded():
+        subprocess.run(["launchctl", "unload", "-w", str(AGENT_PLIST)], capture_output=True)
+    if AGENT_PLIST.is_file():
+        AGENT_PLIST.unlink()
+    if quiet:
+        return
+    if agent_loaded():
+        raise SystemExit(f"LaunchAgent 仍在載入中：{AGENT_LABEL}（plist 已移除）")
+    print(f"  LaunchAgent 已移除：{AGENT_LABEL}" if was else "  LaunchAgent 本來就沒有安裝")
+    print("  之後 Claude 更新不會再有通知；要補回繁體中文就自己執行 patch-claude adapt")
+
+if __name__ == "__main__":
+    cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
+    # install 預設**不啟動 App**。--verify 才跑舊的「開關兩次看心跳」流程。
+    # --skip-verify 保留成可接受但無作用的旗標，舊腳本／舊筆記照貼不會出錯。
+    #
+    # 唯二會重簽章的入口是 install 與 adapt，兩個都必須由使用者自己叫起來：
+    # install 一如既往是明確的手動指令，adapt 在動手之前一定會問並等一個真的
+    # 按鍵。LaunchAgent 跑的是 watch，它連 codesign 都不會呼叫。
+    table = {"install": lambda: install("--dry-run" in sys.argv,
+                                        verify=("--verify" in sys.argv
+                                                and "--skip-verify" not in sys.argv),
+                                        agent="--no-agent" not in sys.argv),
+             "status": status, "verify": verify_cmd, "rearm": rearm,
+             "uninstall": uninstall, "sync": sync,
+             "watch": lambda: watch(check="--check" in sys.argv,
+                                    dry="--dry-run" in sys.argv),
+             "adapt": lambda: adapt(yes="--yes" in sys.argv,
+                                    dry="--dry-run" in sys.argv),
+             # 舊 LaunchAgent 若還載入著，會用這兩個名字進來。導到唯讀的 watch，
+             # 舊 agent 因此在這支檔案落地的當下就從「背景重簽章」變成「只通知」，
+             # 不必等使用者先跑 agent-install。
+             "reapply": legacy_agent_entry, "await-quit": legacy_agent_entry,
+             "agent-install": agent_install, "agent-uninstall": agent_uninstall,
+             "gated": lambda: print(f"  gated.json: {build_gated()} 條 -> {PAYLOAD/'gated.json'}"),
+             "merge": lambda: merge(sys.argv[2])}
+    sys.exit(table.get(cmd, status)() or 0)
