@@ -1,0 +1,400 @@
+Claude	Claude	品牌名，永不翻譯
+Anthropic	Anthropic	公司名，永不翻譯
+Claude Code	Claude Code	產品名，保留英文，勿譯「Claude 程式碼」
+Cowork	Cowork	介面名（與 Chat、Code 並列），保留英文
+Chat	聊天	介面名與一般用語皆用此詞
+Claude Design	Claude Design	功能產品名，保留英文
+Artifact	Artifact	Claude 功能名，保留英文；勿譯「構件／產物」
+MCP	MCP	通訊協定縮寫，保留英文
+MCP server	MCP 伺服器	設定頁常見；server 一律譯「伺服器」
+API	API	保留英文
+API key	API 金鑰	勿用「密鑰／秘鑰」
+CLI	CLI	保留英文
+SDK	SDK	保留英文
+Opus	Opus	模型名，保留英文
+Sonnet	Sonnet	模型名，保留英文
+Haiku	Haiku	模型名，保留英文
+Fable	Fable	模型名，保留英文
+Pro	Pro	方案名，保留英文
+Max	Max	方案名，保留英文；勿譯「最大」
+Free	免費	Free plan → 免費方案
+Team	團隊	Team plan → 團隊方案
+Enterprise	企業	Enterprise plan → 企業方案
+Free plan	免費方案	方案名，Free 保留概念但譯為免費
+Pro plan	Pro 方案	Pro 保留英文，加「方案」
+Max plan	Max 方案	Max 保留英文，加「方案」
+Team plan	團隊方案	團隊方案，勿譯「小組方案」
+Enterprise plan	企業方案	企業方案，勿譯「企業版方案」
+Claude Desktop	Claude 桌面版	產品名＋台灣慣用「桌面版」
+Quick Entry	快速輸入	桌面版功能名
+Claude Tag	Claude Tag	產品名，保留英文
+GitHub	GitHub	保留英文
+Slack	Slack	保留英文
+Google Workspace	Google Workspace	保留英文
+Chrome	Chrome	保留英文
+Skill	技能	Skills 不加複數
+Agent	代理程式	沿用台灣微軟譯法；勿用「智能體／特工」
+Agent Skills	代理程式技能	功能名，Agent 與 Skill 兩詞須一致
+Subagent	子代理程式	Cowork/Code 中派生的代理程式
+Agentic	代理式	agentic AI → 代理式 AI
+Agent proxy	Agent Proxy	保留英文，避免與「代理程式」混淆
+Connector	連接器	台灣慣用譯法，勿用「連接件」
+Project	專案	勿用「項目」
+Project knowledge	專案知識	專案內的參考檔案集合
+Extended thinking	延伸思考	開關與說明文案一律用此詞
+Thinking	思考	Thinking… → 思考中…
+Auto thinking	自動思考	思考模式選項
+Adaptive thinking	適應性思考	思考模式選項
+Fast mode	快速模式	開關名稱，勿譯「高速模式」
+Auto mode	自動模式	模式名稱
+Plan mode	規劃模式	此處 plan 非「方案」
+Permission mode	權限模式	Code/Cowork 的權限模式
+Bypass permissions	略過權限檢查	模式名為「略過權限模式」
+Computer use	電腦操作	讓 Claude 操作電腦的功能名
+Memory	記憶	Claude 的記憶功能
+Memory (RAM)	記憶體	硬體用語，與功能名區分
+Research	研究	功能名與一般名詞同詞
+Deep research	深度研究	功能名
+Analysis tool	分析工具	對話內建工具名
+Usage	用量	勿譯「使用情況」
+Usage limits	用量上限	方案用量上限，勿譯「使用限制」
+Extra usage	額外用量	超出方案後的付費用量
+Usage credits	用量點數	購買的用量點數
+Credit	點數	勿譯「信用／額度」
+Spend	支出	花費金額，與 usage（用量）區分
+Spend limit	支出上限	管理員設定的金額上限
+Session	工作階段	Cowork/Code 的工作階段
+Task	任務	Cowork 任務與排程任務共用
+Scheduled task	排程任務	依排程執行的任務
+Routine	例行任務	依排程執行的雲端代理程式
+Run	執行	名詞語境用「執行紀錄」
+Runner	執行器	自架執行機器
+Runner pool	執行器集區	多台執行器的集合
+Environment	環境	開發／執行環境
+Cloud environment	雲端環境	Anthropic 代管環境
+Self-hosted	自架	self-hosted environment → 自架環境
+Worktree	worktree	Git 術語，保留英文
+Hook	Hook	Claude Code 術語，保留英文
+Plugin	外掛程式	台灣慣用譯法，與擴充功能區分
+Extension	擴充功能	勿譯「延伸／分機」
+Desktop extension	桌面擴充功能	桌面版可安裝的擴充功能
+Marketplace	市集	外掛程式與技能的市集
+Directory (listing)	目錄	如連接器目錄、擴充功能目錄
+Tool	工具	模型可呼叫的工具
+Tool call	工具呼叫	模型呼叫工具的動作
+Built-in	內建	內建工具／內建技能
+Organization	組織	企業／團隊層級單位
+Workspace	工作區	組織下的工作區，非 Slack workspace 時亦同
+Seat	席次	勿譯「座位」
+Seat tier	席次層級	席次等級（如 Chat＋Code）
+Plan	方案	訂閱方案；與 Plan mode 區分
+Subscription	訂閱	訂閱關係，動詞用「訂閱」
+Billing	帳單	設定分頁名
+Invoice	發票	單據；與功能區「帳單」區分
+Payment method	付款方式	付款方式設定
+Card	信用卡	信用卡或簽帳金融卡
+Trial	試用	試用期，動詞用「試用」
+Renew	續訂	續訂訂閱
+Renewal	續約	續約時點或條件
+Upgrade	升級	方案或席次升級
+Downgrade	降級	方案或席次降級
+Prorated	按比例計算	依剩餘期間按比例計費
+Refund	退款	退款
+Account	帳戶	全站統一，勿混用「帳號」
+Profile	個人檔案	個人檔案設定
+Member	成員	組織成員
+Admin	管理員	組織管理員角色
+Administrator	系統管理員	IT 層級，與 Admin 區分
+Owner	擁有者	組織或專案擁有者
+Primary owner	主要擁有者	組織唯一主要擁有者
+Role	角色	權限角色
+Group	群組	成員群組，勿譯「組」
+Invite	邀請	名詞動詞同詞
+Invite link	邀請連結	可分享的邀請網址
+Accept	接受	接受邀請或條款
+Decline	婉拒	婉拒邀請
+Revoke	撤銷	撤銷金鑰、邀請或存取權
+Assign	指派	指派角色、席次或群組
+Permission	權限	權限，勿用「許可」
+Access	存取	勿用「訪問」
+Grant	授予	授予權限
+Request	要求	名詞，如「存取要求」
+Approve	核准	核准要求
+Approved	已核准	狀態標籤
+Pending	待處理	待核准或待處理狀態
+Deny	拒絕	拒絕權限要求
+Allow	允許	允許權限要求
+Always allow	一律允許	權限對話框選項
+Allow once	允許一次	權限對話框選項
+Ask each time	每次詢問	權限對話框選項
+Allowed domains	允許的網域	網域允許清單
+Deny list	拒絕清單	封鎖清單
+Audit log	稽核記錄	組織稽核記錄
+Analytics	分析	使用分析報表
+Compliance	法規遵循	法規遵循設定
+Policy	政策	組織政策設定
+Terms	條款	服務條款
+Privacy	隱私	隱私設定與說明
+Sign in	登入	勿用「登陸」
+Sign out	登出	勿用「退出」
+Authentication	驗證	身分驗證
+Authorization	授權	授權流程
+Credentials	認證資訊	帳密或金鑰等認證資料
+Certificate	憑證	TLS／簽章憑證
+Token	Token	LLM token 保留英文；勿譯「代幣」
+Access token	存取權杖	驗證用權杖，與 LLM token 區分
+Bearer token	Bearer 權杖	HTTP 授權標頭用權杖
+Secret	密鑰	client secret → 用戶端密鑰
+Encryption key	加密金鑰	加密用金鑰
+SSO	SSO	保留英文
+SCIM	SCIM	保留英文
+OAuth	OAuth	保留英文
+IdP	IdP	身分提供者，縮寫保留英文
+Endpoint	端點	API 端點網址
+Webhook	Webhook	保留英文
+Header	標頭	HTTP 標頭
+Parameter	參數	設定或請求參數
+Server	伺服器	勿譯「服務器」
+Client	用戶端	勿譯「客戶端」
+Host	主機	勿譯「主辦」
+Proxy	代理伺服器	網路代理伺服器
+Domain	網域	網際網路網域
+URL	網址	一般 UI 用「網址」，技術欄位可保留 URL
+Network	網路	勿用「网络」式譯法
+Local	本機	本機端，勿譯「本地」
+Remote	遠端	遠端，勿譯「遠程」
+Cloud	雲端	雲端
+Provider	供應商	服務或身分供應商
+Inference	推論	模型推論，勿譯「推理」
+Region	區域	雲端區域
+Instance	執行個體	服務執行個體
+Virtual machine	虛擬機器	簡稱 VM 時保留英文
+Sandbox	沙箱	隔離執行環境
+Telemetry	遙測	遙測資料
+Rate limit	速率限制	API 呼叫速率限制
+File	檔案	勿用「文件」
+Folder	資料夾	勿用「文件夾」
+Directory (path)	目錄	檔案系統路徑
+Path	路徑	檔案或資料夾路徑
+Trusted folder	信任的資料夾	Claude Code 信任的資料夾
+Disk space	磁碟空間	磁碟可用空間
+Storage	儲存空間	儲存空間配額
+Cache	快取	勿譯「緩存」
+Upload	上傳	勿用「上載」
+Download	下載	勿用「下載檔案」以外的贅詞
+Attach	附加	附加檔案或內容
+Attachment	附件	已附加的檔案
+Drag and drop	拖放	拖放操作
+Screenshot	螢幕截圖	勿用「屏幕」
+Screen	螢幕	勿用「屏幕」
+Image	圖片	一般 UI 用「圖片」，勿用「影像」
+Video	影片	勿用「視頻」
+Window	視窗	勿用「窗口」
+Tab	分頁	瀏覽器分頁與側邊欄分頁同用
+Sidebar	側邊欄	左側導覽區
+Menu	選單	勿用「菜單」
+Menu bar	選單列	macOS 頂端選單列
+Keyboard shortcut	鍵盤快速鍵	完整說法
+Shortcut	快速鍵	按鍵組合，空間不足時用
+Notification	通知	系統與應用內通知
+Notification area	通知區域	Windows 系統匣
+Dictation	語音輸入	語音轉文字輸入
+Device	裝置	實體或行動裝置
+App	應用程式	勿用「軟體」代替
+Desktop	桌面版	Claude Desktop → Claude 桌面版
+Browser	瀏覽器	網頁瀏覽器
+Terminal	終端機	命令列終端機
+Emulator	模擬器	Android 模擬器語境
+Simulator	模擬器	iOS 模擬器語境
+Mouse	滑鼠	勿用「鼠標」
+Conversation	對話	一段完整對話，與訊息區分
+Message	訊息	勿用「信息」
+Prompt	提示詞	勿單用「提示」，避免與 tooltip 混淆
+Model	模型	Claude 模型
+Context	上下文	模型可見的上下文
+Context window	上下文視窗	模型上下文長度
+Turn	回合	對話回合，勿譯「轉」
+Response	回應	Claude 的輸出
+Reply	回覆	使用者的回覆
+Thread	討論串	非程式的 thread（執行緒）
+Comment	留言	程式碼審查留言亦用此詞
+Draft	草稿	未送出的草稿
+Summary	摘要	自動產生的摘要
+Recap	回顧	週報／會議回顧
+Transcript	逐字稿	工作階段逐字稿
+Knowledge base	知識庫	知識庫來源
+Chat history	聊天記錄	歷史聊天清單
+Branch (conversation)	分支	Branch to new chat → 分支到新聊天
+Regenerate	重新產生	重新產生回應
+Send	傳送	送出訊息，勿用「發送」
+Retry	重試	重試失敗操作
+Edit	編輯	編輯內容
+Delete	刪除	永久刪除
+Share (verb)	分享	分享給他人
+Share (noun)	分享連結	已建立的分享項目
+Shared	已分享	已分享狀態
+Publish	發布	勿用「發佈」
+Unpublish	取消發布	撤下已發布內容
+Pin	釘選	釘選到側邊欄或清單頂端
+Unpin	取消釘選	取消釘選
+Archive	封存	封存不刪除
+Unarchive	取消封存	自封存取回
+Export	匯出	勿用「導出」
+Import	匯入	勿用「導入」
+Add	新增	新增項目，勿用「添加」
+Create	建立	建立新物件
+New	新增	New Conversation → 新增對話
+Remove	移除	解除關聯，與「刪除」區分
+Clear	清除	清空欄位或記錄
+Save	儲存	儲存變更，勿用「保存」
+Discard	捨棄	捨棄未儲存內容
+Cancel	取消	取消動作或訂閱
+Confirm	確認	確認動作
+Apply	套用	套用設定，勿用「應用」
+Reset	重設	重設為初始值
+Restart	重新啟動	重新啟動應用程式
+Reload	重新載入	重新載入設定或頁面
+Refresh	重新整理	重新整理資料
+Restore	還原	還原資料或設定
+Update	更新	更新版本或內容
+Install	安裝	安裝
+Uninstall	解除安裝	勿用「卸載」
+Reinstall	重新安裝	重新安裝
+Enable	啟用	啟用功能，勿用「開啟」
+Disable	停用	停用功能，勿用「禁用」
+Enabled	已啟用	狀態標籤
+Disabled	已停用	狀態標籤
+Turn on	開啟	開關動作，與 Enable 區分
+Turn off	關閉	開關動作，與 Disable 區分
+Toggle	切換	切換開關
+Switch	切換	切換對象，如切換組織
+Connect	連接	與「連接器」用詞一致
+Disconnect	中斷連接	中斷與服務的連接
+Connected	已連接	狀態標籤
+Connection	連線	網路連線語境
+Configure	設定	動詞
+Configuration	設定	一律用「設定」，勿用「組態」
+Config file	設定檔	設定檔案
+Settings	設定	設定頁面
+Preferences	偏好設定	使用者偏好設定
+Set up	設定	動詞
+Setup	設定流程	名詞
+Continue	繼續	繼續流程
+Dismiss	忽略	與 Close（關閉）區隔
+Close	關閉	關閉視窗或面板
+Open	開啟	開啟項目
+Quit	結束	macOS 選單用語
+Exit	結束	離開流程或全螢幕
+Minimize	最小化	視窗最小化
+Expand	展開	展開區塊
+Collapse	收合	收合區塊
+Show	顯示	顯示項目
+Hide	隱藏	隱藏項目
+View	檢視	檢視內容
+Manage	管理	管理設定
+Search	搜尋	勿用「檢索」
+Filter	篩選	篩選清單
+Sort	排序	排序清單
+Select	選取	選取項目，勿用「選中」
+Choose	選擇	選擇選項
+Copy	複製	複製內容
+Paste	貼上	貼上內容
+Cut	剪下	剪下內容
+Duplicate	建立副本	避免與 Copy 混淆
+Rename	重新命名	重新命名
+Move	移動	移動項目
+Submit	送出	送出表單，勿用「提交」
+Skip	略過	略過步驟
+Start	開始	開始工作階段或任務
+Stop	停止	停止進行中的動作
+Pause	暫停	暫停訂閱或工作
+Resume	繼續	恢復進行
+Finish	完成	完成流程
+Done	完成	按鈕文案
+Next	下一步	流程下一步
+Back	上一步	流程上一步
+Undo	復原	復原上一步
+Redo	重做	重做已復原的動作
+Generate	產生	勿用「生成」
+Preview	預覽	預覽內容
+Verify	驗證	驗證網域或身分
+Sync	同步	同步資料
+Merge	合併	合併分支或內容
+Merge conflict	合併衝突	Git 合併衝突
+Report (content)	檢舉	檢舉不當內容
+Report (analytics)	報表	使用量或支出報表
+Default	預設	勿用「默認」
+Custom	自訂	自訂設定，勿用「客製」以外語境
+Advanced	進階	進階設定
+Optional	選填	表單欄位用語
+Required	必填	表單欄位用語
+Available	可用	可用狀態
+Unavailable	無法使用	不可用狀態
+Active	使用中	啟用中或使用中
+Inactive	未使用	未使用狀態
+Loading	載入中	載入中狀態
+Processing	處理中	處理中狀態
+Error	錯誤	錯誤訊息
+Warning	警告	警告訊息
+Failed	失敗	Failed to X → X 失敗
+Try again	請再試一次	標準錯誤補述句
+Something went wrong	發生錯誤	勿直譯「有東西出錯了」
+Learn more	瞭解詳情	標準說明連結文案
+Get support	取得支援	聯絡支援
+Help	說明	說明選單
+Documentation	說明文件	線上說明文件
+Feedback	意見回饋	使用者意見回饋
+Status	狀態	狀態欄位
+Details	詳細資料	詳細資料頁或欄位
+Overview	總覽	總覽頁
+More	更多	更多選項
+Version	版本	版本號
+Beta	Beta	保留英文
+Data	資料	勿用「數據」，統計語境除外
+Information	資訊	勿用「信息」
+Quality	品質	勿用「質量」
+Performance	效能	系統效能
+Debug	偵錯	偵錯功能
+Developer mode	開發人員模式	開發人員模式開關
+Diagnostics	診斷	診斷報告
+Crash	當機	應用程式當機
+Hardware acceleration	硬體加速	圖形硬體加速
+Log	記錄	記錄內容
+Log file	記錄檔	記錄檔案
+Repository	儲存庫	Git 儲存庫
+Branch (Git)	分支	Git 分支
+Commit	提交	Git 語境；勿譯「承諾」
+Pull request	Pull Request	台灣開發者慣用英文，可簡稱 PR
+Diff	差異	檔案差異比較
+Code	程式碼	程式碼內容
+Program	程式	一般程式
+Software	軟體	勿用「软件」式譯法
+Command	指令	命令列指令
+Script	指令碼	指令碼檔案
+Snapshot	快照	狀態快照
+Bundle	套組	debug bundle → 偵錯套組
+Queue	佇列	等待佇列
+Schedule	排程	排定執行時間
+Trigger	觸發條件	觸發條件設定
+Daily	每日	頻率選項
+Weekly	每週	頻率選項
+Monthly	每月	頻率選項
+Annual	每年	年繳或年度
+Time zone	時區	時區設定
+Date	日期	日期欄位
+Time	時間	時間欄位
+Name	名稱	名稱欄位
+Email	電子郵件	電子郵件，勿用「郵箱」
+Email address	電子郵件地址	完整欄位標籤
+Bold	粗體	文字格式
+Heading	標題	文字格式標題
+Blockquote	引文區塊	引文格式
+Line	行	程式碼行號語境
+Personalization	個人化	個人化設定
+Dashboard	儀表板	管理儀表板
+Metric	指標	統計指標
+Insight	洞察	分析洞察
+Chart	圖表	統計圖表
+Onboarding	新手引導	首次使用引導流程
+Full screen	全螢幕	全螢幕模式
+No X yet	尚無…	空狀態句型，如 No runs yet → 尚無執行紀錄
