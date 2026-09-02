@@ -398,3 +398,7 @@ Chart	圖表	統計圖表
 Onboarding	新手引導	首次使用引導流程
 Full screen	全螢幕	全螢幕模式
 No X yet	尚無…	空狀態句型，如 No runs yet → 尚無執行紀錄
+SSH agent	SSH 代理程式	ssh-agent；必帶 SSH 前綴，勿與 Claude 的「代理程式」功能混淆
+Effort	強度	推理強度層級：低／中／高／最高；勿譯「努力程度」
+Max effort	最高強度	effort 的頂層；與「高」同屬一組刻度，勿用「最大強度」
+You (second person)	您	介面一律用「您」；既有譯文 您:你 = 5024:543
