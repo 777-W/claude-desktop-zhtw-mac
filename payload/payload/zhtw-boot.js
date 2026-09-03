@@ -395,8 +395,12 @@ try {
   // [A-Za-z0-9_-]，長度放寬到 4..32。
   // 編號不可寫死：Anthropic 在 1.37937.3 把白名單從 shared-2 搬到 shared-3，
   // 就地探測因此撲空、退回英文（背景掃描仍找得到，但要等下次啟動）。
-  // 尾端連字號仍是關鍵：shared-20-… 之類不會被誤中。：shared-20-… 之類不會被誤中。
-  const CHUNK_RE = /\/assets\/v\d+\/shared-\d+-[A-Za-z0-9_-]{4,32}\.m?js$/;
+  // 尾端連字號仍是關鍵：shared-20-… 之類不會被誤中。
+  // 名稱段也不可寫死：1.44121.4 當下線上把白名單從 shared-3 改名成
+  // shared-common-3，只認 shared-<數字> 的舊式樣因此撲空，那次啟動退回英文
+  // （boot.log 03:10:55 ZHTW-INLINE-MISS -> 03:10:56 ZHTW-DISCOVERED，下次啟動才生效）。
+  // 中間那段限定小寫字母且編號仍必須存在，所以 shared-frame-<hash>.js 不會被誤中。
+  const CHUNK_RE = /\/assets\/v\d+\/shared-(?:[a-z]+-)?\d+-[A-Za-z0-9_-]{4,32}\.m?js$/;
 
   // ══════════════════════════════════════════════════════════════════════
   // <<< PURE-END
@@ -435,7 +439,8 @@ try {
   // 所有 chunk 幾乎同時被請求而同時只准壓住一支，不挑族號就會把名額花在最先
   // 到達的 shared-0 上，永遠探錯、退回英文。
   let lastFamily = null;
-  const FAM_RE = /\/shared-(\d+)-[A-Za-z0-9_-]+\.m?js$/;
+  // 族號含名稱段：'common-3' 與 '3' 必須是不同的族，否則兩者會互相誤配。
+  const FAM_RE = /\/shared-((?:[a-z]+-)?\d+)-[A-Za-z0-9_-]+\.m?js$/;
   const famOf = (u) => { const m = FAM_RE.exec(u); return m ? m[1] : null; };
   try {
     const meta = JSON.parse(fs.readFileSync(CACHE_META, 'utf8'));
@@ -443,7 +448,7 @@ try {
       log('改寫快取是舊版改寫語意（pv=' + JSON.stringify(meta.pv) + '，本版 ' + PATCH_VERSION
         + '），忽略並重新探測');
     } else if (meta && meta.locale === LOC && typeof meta.url === 'string' && typeof meta.sha === 'string') {
-      const fam = /\/shared-(\d+)-[A-Za-z0-9_-]+\.m?js$/.exec(meta.url);
+      const fam = FAM_RE.exec(meta.url);
       if (fam) lastFamily = fam[1];
       const b = fs.readFileSync(CACHE_BODY, 'utf8');
       if (sha(b) === meta.sha) { hitUrl = meta.url; hitBody = b; }
