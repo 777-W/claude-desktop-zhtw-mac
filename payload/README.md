@@ -114,7 +114,8 @@ pass-through failure kills every request on the page.
 "Claude changed" means two completely different things, with costs an order of
 magnitude apart. Keeping them apart is the whole shape of this tool.
 
-**(1) A new remote frontend build.** `.../assets/v1/shared-2-<hash>.js` gets a
+**(1) A new remote frontend build.** The whitelist chunk
+(`.../assets/v1/shared-common-3-<hash>.js` at the time of writing) gets a
 new content hash. The bundle on disk is byte-identical; our injection is still
 there. The shim fetches the new chunk, patches it in memory and serves it — on
 the **same launch**, with no restart, no disk write and no re-signature. This is
@@ -148,12 +149,30 @@ nothing.
 ### Adapting to a new remote build, in place
 
 The whitelist chunk is recognisable from its URL alone, which is what makes the
-same-launch path possible. Measured across four independent builds the shape is
-constant (`/assets/v1/shared-2-<hash>.js`), and scanning all ~2200 JS files of a
-shipped bundle with `patchLocaleWhitelist` itself yields exactly one hit — the
-same file the URL shape picks. So the candidate set per launch is a single URL,
-and the cost of probing inline is one extra fetch of one file, only when there
-is no validated rewrite for that URL yet.
+same-launch path possible. Scanning all ~2200 JS files of a shipped bundle with
+`patchLocaleWhitelist` itself yields exactly one hit — the same file the URL
+shape picks. So the candidate set per launch is a single URL, and the cost of
+probing inline is one extra fetch of one file, only when there is no validated
+rewrite for that URL yet.
+
+The shape is `/assets/v1/shared-<name>?-<n>-<hash>.js`, and neither `<name>` nor
+`<n>` may be hardcoded — both have moved, and each move cost one English launch
+before the pattern was widened:
+
+| observed in | URL |
+|---|---|
+| up to 1.37937.2 | `shared-2-<hash>.js` |
+| 1.37937.3 | `shared-3-<hash>.js` |
+| 1.44121.4 | `shared-common-3-<hash>.js` |
+
+`CHUNK_RE` therefore accepts an optional lowercase name segment, and the family
+key that `FAM_RE` extracts includes it, so `common-3` and `3` are different
+families and cannot mis-match each other. The digits stay mandatory, which is
+what keeps `shared-frame-<hash>.js` — a real sibling with no number — out.
+
+The family key matters because every chunk is requested at almost the same
+moment and only one request may be held per launch: without it the single hold
+is spent on whichever chunk arrives first.
 
 `onBeforeRequest` holds that one callback (5 s cap, plus a 6.5 s backstop
 timer), fetches the chunk, patches it, caches it in `chunk-cache.js` keyed by
@@ -574,16 +593,17 @@ Every install backs up to `/Applications/Claude.backup-before-zhTW-<ts>.app`.
 
 ## Translation
 
-27,209 strings, translated from the English source rather than converted from
+27,949 strings, translated from the English source rather than converted from
 Simplified. `glossary.tsv` holds 404 normative Taiwan terms. The translation
 memory is keyed by **English source string**, not by Claude's internal message
 ids, so it survives Claude's internal refactors: after an update, existing
 strings carry over and only genuinely new English appears untranslated.
 
 That property is measured, not assumed. Claude 1.40609.1 arrived with 1,642
-strings the memory had never seen; every other string in the catalogue still
-matched, so `sync` reported 24,023/25,634 for `main` rather than starting over.
-Coverage of the installed catalogues (main, dynamic, shell) is currently 100%.
+strings the memory had never seen and 1.44121.4 with a further 740; every other
+string in each catalogue still matched, so `sync` reported 24,023/25,634 and
+then 25,119/25,775 for `main` rather than starting over. Coverage of the
+installed catalogues (main, dynamic, shell) is currently 100%.
 
     bin/patch-claude sync              # -> pending.json  {category: {en: en}}
     # translate the values, save as {en: zh}
