@@ -402,3 +402,12 @@ SSH agent	SSH 代理程式	ssh-agent；必帶 SSH 前綴，勿與 Claude 的「�
 Effort	強度	推理強度層級：低／中／高／最高；勿譯「努力程度」
 Max effort	最高強度	effort 的頂層；與「高」同屬一組刻度，勿用「最大強度」
 You (second person)	您	介面一律用「您」；既有譯文 您:你 = 5024:543
+Identity profile	身分設定檔	認證與存取權設定檔；勿用 Profile 的「個人檔案」
+Access bundle	存取套組	依 Bundle→套組；勿用「存取套件」
+Silo (memory)	儲存槽	記憶隔離容器
+Inference hook	推論 Hook	Hook 保留英文
+Shadow mode	影子模式	只記錄不封鎖的觀察模式
+Verdict	判定結果	作修飾語時可略為「判定」，如「提示詞判定逾時」
+Scope	範圍	權限／設定的適用範圍
+Rotate	輪替	金鑰或密鑰輪替
+Held message	已保留的訊息	作謂語時用「仍在保留中」
