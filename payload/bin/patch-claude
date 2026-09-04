@@ -832,10 +832,32 @@ def install(dry=False, verify=False, agent=True):
     else:
         print("  ⚠ 磁碟上找不到官方簽章的 Claude（APP 與所有備份都是 ad-hoc）")
         print("    這次照舊簽 —— 內建自動更新會維持無法安裝，只能從官網下載 DMG")
+    # 取材來源必須是官方 bundle。APP 自己是官方版時就用它（官方更新之後的常見
+    # 情形，official_dr 第一個就命中 APP）。APP 已經是我們簽過的版本時，
+    # official_dr 會一路退到備份才找到官方簽章 —— 這時若照舊從 APP 取材，
+    # patch_asar 會以「app.asar 已被修補過」中止，等於「已經是繁中版就再也不能
+    # 重新套用」，而外層 .command 卻主動提供「要重新套用嗎？」這個選項。
+    #
+    # 版本必須先對上才敢用備份：備份是更早的 Claude，從它取材會把使用者降級。
+    # 正常情況下 APP 已修補就代表這之後沒更新過，兩者本來就同版；對不上表示
+    # 狀態不是我們以為的樣子，寧可停下來也不要默默換掉他的 App。
+    src_app = APP
+    if dr_src is not None and dr_src != APP:
+        av = app_versions(APP)
+        bv = app_versions(dr_src)
+        if av != bv:
+            raise SystemExit(
+                f"目前的 Claude 是 {av[0]} ({av[1]})，但磁碟上唯一帶官方簽章的 "
+                f"bundle 是 {dr_src.name} 的 {bv[0]} ({bv[1]})。\n"
+                "從它取材會把你降級，所以中止，未更動你的 App。\n"
+                "請先執行 patch-claude uninstall 還原官方版，再重新安裝。")
+        src_app = dr_src
+        print(f"  目前的 App 已是繁體中文版 —— 改從官方備份取材 {dr_src.name}")
+
     tmp = Path(tempfile.mkdtemp(prefix="zhtw-app."))
     staged = tmp / "Claude.app"
     print(f"  複製到暫存區 {staged}")
-    sh(["ditto", str(APP), str(staged)])
+    sh(["ditto", str(src_app), str(staged)])
     stats, src = build_catalogs(staged, staged / "Contents/Resources/zhtw")
     for k, (h, n) in stats.items():
         if n:
