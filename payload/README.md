@@ -593,18 +593,18 @@ Every install backs up to `/Applications/Claude.backup-before-zhTW-<ts>.app`.
 
 ## Translation
 
-29,154 strings, translated from the English source rather than converted from
+29,344 strings, translated from the English source rather than converted from
 Simplified. `glossary.tsv` holds 413 normative Taiwan terms. The translation
 memory is keyed by **English source string**, not by Claude's internal message
 ids, so it survives Claude's internal refactors: after an update, existing
 strings carry over and only genuinely new English appears untranslated.
 
-That property is measured, not assumed. Three consecutive Claude releases —
-1.40609.1, 1.44121.4, 1.46388.2 — brought 1,642, 740 and 1,205 strings the
-memory had never seen. Every other string in each catalogue still matched, so
-`sync` reported 24,023/25,634, then 25,119/25,775, then 25,356/26,530 for
-`main` rather than starting over. Coverage of the installed catalogues (main,
-dynamic, shell) is currently 100%.
+That property is measured, not assumed. Four consecutive Claude releases —
+1.40609.1, 1.44121.4, 1.46388.2, 1.46388.4 — brought 1,642, 740, 1,205 and 190
+strings the memory had never seen. Every other string in each catalogue still
+matched, so `sync` reported 24,023/25,634, then 25,119/25,775, then
+25,356/26,530, then 26,535/26,723 for `main` rather than starting over.
+Coverage of the installed catalogues (main, dynamic, shell) is currently 100%.
 
     bin/patch-claude sync              # -> pending.json  {category: {en: en}}
     # translate the values, save as {en: zh}
