@@ -84,6 +84,11 @@
   "src": "manual",
   "zh": "從我說今天需要完成的事開始：「{today}」。請先完整處理一次。"
  },
+ "002e8d850ef7038103829cbf5559fd571d86f7be": {
+  "en": "This computer couldn’t sign the approval — press Schedule again to go ahead.",
+  "src": "manual",
+  "zh": "這台電腦無法簽署此核准 — 請再次按下「排程」以繼續。"
+ },
  "003019897a9a08df0e35ee84c1e6743c3036adf6": {
   "en": "View teams",
   "src": "A08",
@@ -1384,6 +1389,11 @@
   "src": "C14",
   "zh": "供應商拒絕了您的認證資訊。請在「設定」中重新輸入。"
  },
+ "02ddb49827b95797f69d02a61999259f0946759c": {
+  "en": "Fable 5.1 will automatically adopt your Fable 5 settings on September 8",
+  "src": "manual",
+  "zh": "Fable 5.1 將於 9 月 8 日自動沿用您的 Fable 5 設定"
+ },
  "02de6dc450f550139f1b46738e012efb0d9beb5e": {
   "en": "Summarize what’s in my inbox today and flag the three emails that genuinely need my attention, with a one-line reason for each. Then tell me what can safely wait and what I can archive without reading.",
   "src": "C13",
@@ -2439,6 +2449,11 @@
   "src": "A04",
   "zh": "監控用量"
  },
+ "0482f088371a9683c0909fbb0fe97f5bb4319f49": {
+  "en": "No link for a claim, the wrong link, or a link to a whole folder instead of the exact doc.",
+  "src": "manual",
+  "zh": "論述沒有附連結、附錯連結，或連到整個資料夾而非確切的文件。"
+ },
  "04830f2c836ff3920b7c1df8bbbba5861bf1748e": {
   "en": "Marketplace sync failed. Check the repository URL and try again.",
   "src": "C09",
@@ -2828,6 +2843,11 @@
   "en": "Authentication needed",
   "src": "B00",
   "zh": "需要進行驗證"
+ },
+ "0549682422b74b4d630b96357dfe9a7058ba52e8": {
+  "en": "{count, plural, one {# more} other {# more}}",
+  "src": "manual",
+  "zh": "{count, plural, one {另外 # 個} other {另外 # 個}}"
  },
  "054aad8732f7c9a3c197be2e426b4ff8f4988a23": {
   "en": "{count, plural, one {# plugin from {marketplaceName} is ready to use.} other {# plugins from {marketplaceName} are ready to use.}}",
@@ -3879,6 +3899,11 @@
   "src": "C10",
   "zh": "目前已載入的 {loaded, plural, one {# 個工作階段} other {# 個工作階段}}中，沒有排入佇列的工作階段。"
  },
+ "07417e2f86f5227c4aa5b40ed3b5fd369cad49a5": {
+  "en": "Used your computer",
+  "src": "manual",
+  "zh": "已使用您的電腦"
+ },
  "0741aaa35542f908a412817eed2e11393b820652": {
   "en": "Couldn’t turn on memory. You can enable it from Settings → Memory.",
   "src": "C05",
@@ -3913,6 +3938,11 @@
   "en": "What are you building?",
   "src": "manual",
   "zh": "您在建立什麼？"
+ },
+ "074be08ba498001566174aa0120a30a655815a60": {
+  "en": "Uploaded {count, number} of {total, plural, one {# skill} other {# skills}} — ready to use after a quick security scan (1–2 minutes).",
+  "src": "manual",
+  "zh": "已上傳 {count, number} / {total, plural, one {# 個技能} other {# 個技能}} —— 完成快速安全掃描（1–2 分鐘）後即可使用。"
  },
  "074c5586420bdc559c4072dd26088961bc5fc207": {
   "en": "A connector with this URL already exists in this organization. Press Connect and authorize again to use it.",
@@ -5054,6 +5084,11 @@
   "src": "C20",
   "zh": "已新增 {count, plural, one {# 個群組} other {# 個群組}}（上限 {max} 個）"
  },
+ "0928a14fbdc427fd59364e74dfa3fb5f49b44dfc": {
+  "en": "No allow rule uses this credential yet, so Claude can’t use it.",
+  "src": "manual",
+  "zh": "尚無允許規則使用此認證資訊，因此 Claude 無法使用。"
+ },
  "092a549bbe5d7cfbd3c03edb0b86d0dcc0ccf3a9": {
   "en": "Couldn’t read that file. Choose a different zip.",
   "src": "B02",
@@ -6039,6 +6074,11 @@
   "src": "A08",
   "zh": "及其他 {count} 項"
  },
+ "0aa84f89543a67846c034891e05d925741c41c59": {
+  "en": "Try uploading {fileName} again",
+  "src": "manual",
+  "zh": "請再次嘗試上傳 {fileName}"
+ },
  "0aab6a575e143c08cf2e8b9390ff5e673b15b168": {
   "en": "Previous period",
   "src": "A05",
@@ -6714,6 +6754,11 @@
   "src": "manual",
   "zh": "複製檔案"
  },
+ "0ba2472f2439c35f8b8814b91c2859cda2acd2df": {
+  "en": "Listing files",
+  "src": "manual",
+  "zh": "正在列出檔案"
+ },
  "0ba3b1233d67c83271ff7cb563e79a5ebdd42213": {
   "en": "Back to Ant tools",
   "src": "A00",
@@ -7153,6 +7198,11 @@
   "en": "Pull data from 60+ scientific databases in one place",
   "src": "manual",
   "zh": "在同一處拉取超過 60 個科學資料庫的資料"
+ },
+ "0c5572c8531478a023bec15606fd6574719f89ac": {
+  "en": "The scan scope isn’t a valid directory path. Check it for spaces or special characters.",
+  "src": "manual",
+  "zh": "掃描範圍不是有效的目錄路徑。請檢查是否含有空格或特殊字元。"
  },
  "0c55b41b72b2a68faff29a506d4a84f6f1c86e91": {
   "en": "Industries",
@@ -8299,6 +8349,11 @@
   "src": "identity",
   "zh": "URL"
  },
+ "0e2e250fe7e000addb522f4110943cfe45aa434f": {
+  "en": "Your organization doesn’t allow the remote sessions that scans need.",
+  "src": "manual",
+  "zh": "您的組織不允許掃描所需的遠端工作階段。"
+ },
  "0e2e4da645081478e549ec53a242353bf1d23b94": {
   "en": "Not available in cloud Code sessions, which do not run on this computer.",
   "src": "manual",
@@ -9094,6 +9149,11 @@
   "src": "B01",
   "zh": "正在檢查游標位置"
  },
+ "0fbbdbe387f0dd86ccc60bd87ae2b606b2be1fa5": {
+  "en": "Project workspace",
+  "src": "manual",
+  "zh": "專案工作區"
+ },
  "0fbdcbbc5bdf72a775c77d3f34e603ad9c4a92f2": {
   "en": "Open this conversation in the Claude desktop app to finish setup.",
   "src": "C10",
@@ -9153,6 +9213,11 @@
   "en": "Locked while a domain claim is in progress",
   "src": "B04",
   "zh": "網域驗證進行中時將鎖定"
+ },
+ "0fd4aa5002492741640a35fce89e5611e66650f5": {
+  "en": "Thanks, your feedback was sent to the team.",
+  "src": "manual",
+  "zh": "感謝您，您的意見回饋已送交團隊。"
  },
  "0fd71cf7e2bf089438ae15313304d552e1f094dd": {
   "en": "Syncing marketplace...",
@@ -10114,6 +10179,11 @@
   "src": "C03",
   "zh": "已登入您帳戶、可供 Claude 自動化操作的 Chrome 執行個體。"
  },
+ "1187ad90159e96f6ce9fbdb93ffb149d76e0bbaf": {
+  "en": "Centralized management setup is in progress: {coveredCount, number} of {childOrgCount, plural, one {# organization} other {# organizations}} approved.",
+  "src": "manual",
+  "zh": "集中管理設定進行中：{childOrgCount, plural, one {# 個組織} other {# 個組織}}中已核准 {coveredCount, number} 個。"
+ },
  "1188fee5417f83aa504e6f13d414f45f37fd9cc5": {
   "en": "Adapt lessons for different proficiency levels and learning needs.",
   "src": "manual",
@@ -10938,6 +11008,11 @@
   "en": "Catch me up",
   "src": "A01",
   "zh": "幫我補進度"
+ },
+ "131eb4d11b54cf8842180bb43c95793e4dbd47f7": {
+  "en": "This project’s scan settings aren’t valid, so running the scan again won’t work. Create a new project, and check any directory path for spaces or special characters.",
+  "src": "manual",
+  "zh": "此專案的掃描設定無效，因此重新執行掃描也不會成功。請建立新專案，並檢查目錄路徑是否含有空格或特殊字元。"
  },
  "131f1bbd6cd0063eaf05e618efd392355016f2f0": {
   "en": "Artifacts are created by other users and aren’t verified by Anthropic. Only download files you trust.",
@@ -12634,6 +12709,11 @@
   "src": "B02",
   "zh": "擬定內容策略"
  },
+ "161e863a308b3758c8063b09f08c93b91866041e": {
+  "en": "Listing windows",
+  "src": "manual",
+  "zh": "正在列出視窗"
+ },
  "161f4ce8662cff6a6c6fc6b6c33b51fd212294ed": {
   "en": "Customize {serverName}",
   "src": "B02",
@@ -13268,6 +13348,11 @@
   "en": "No folders yet.",
   "src": "A04",
   "zh": "尚無資料夾。"
+ },
+ "173a279983762b3a660f79d20b9d7e42f04ae18b": {
+  "en": "Ops manager",
+  "src": "manual",
+  "zh": "維運主管"
  },
  "173c7c461ea35c384781d0fea557c1ad09f8a388": {
   "en": "Replaces the tool names below with your server’s current list ({tools}) and refreshes the annotation summary reviewers see. Prompt names are left untouched. Changes are reviewed before going live.",
@@ -15144,6 +15229,11 @@
   "src": "B08",
   "zh": "已更新技能：{name}"
  },
+ "1a65a03e24542f77cb089cde51d5538fb5682705": {
+  "en": "Hand Claude the whole task. It does the work and brings it back done.",
+  "src": "manual",
+  "zh": "把整個任務交給 Claude，由它完成工作並交回成果。"
+ },
  "1a69d802384762f2a4e0d0bcc0f2cb781b6a8b37": {
   "en": "The last bulk send didn’t finish. Sending again will skip members who were invited in the last hour.",
   "src": "manual",
@@ -15734,6 +15824,11 @@
   "src": "A02",
   "zh": "財務"
  },
+ "1b4ca3892034db39819125d20ed085d26019d7db": {
+  "en": "How is it doing?",
+  "src": "manual",
+  "zh": "表現如何？"
+ },
  "1b4e0b6c90455ef0d8a014388535a16985fa0dc1": {
   "en": "Changing the directory isn’t available for this session.",
   "src": "B01",
@@ -15969,6 +16064,11 @@
   "src": "manual",
   "zh": "包含 Claude Opus，還有："
  },
+ "1bbd0289bea16822486eda92c2edef593638aa80": {
+  "en": "Using your computer",
+  "src": "manual",
+  "zh": "正在操作您的電腦"
+ },
  "1bbda750798447efaa6d621926e85bf18a3109a4": {
   "en": "Help me get something working today. If this is a code project, walk me through what it does. If it’s empty or not a project, give me 3 small, fun interactive ideas — one productivity tool, one creative toy, one game — and let’s build one in a new subfolder.",
   "src": "C07",
@@ -16118,6 +16218,11 @@
   "en": "Get faster replies and automated reviews for your team by buying extra usage.",
   "src": "C07",
   "zh": "購買額外用量，讓您的團隊獲得更快的回覆速度與自動化審查。"
+ },
+ "1bfab26b6154fd3d1b6cf561e15566c5cf554b86": {
+  "en": "Releasing control of the computer",
+  "src": "manual",
+  "zh": "正在釋放電腦控制權"
  },
  "1bfb655521a021b6840e5372ba28333de49963a6": {
   "en": "This routine was disabled because the feature it uses isn’t available on your plan or organization.",
@@ -16363,6 +16468,11 @@
   "en": "Looking for something else? <link>Browse all connectors</link>",
   "src": "C09",
   "zh": "想找其他項目嗎？<link>瀏覽所有連接器</link>"
+ },
+ "1c66cefa7affbaa7a3475518f2e3ff07c15c05e0": {
+  "en": "Bringing {app} window to this desktop",
+  "src": "manual",
+  "zh": "正在將 {app} 視窗移至此桌面"
  },
  "1c6953c91c676ef99bd0a3ba81de08ec7c5bbb85": {
   "en": "Couldn't check for updates",
@@ -20559,6 +20669,11 @@
   "src": "manual",
   "zh": "連接器 Favicon，以及 Artifact 預覽與 MCP Apps 小工具 iframe 的來源網域。Artifact 將無法呈現。"
  },
+ "23fd41956f769ec93049053a65aed82e176302aa": {
+  "en": "{action} in {app}",
+  "src": "manual",
+  "zh": "在 {app} 中{action}"
+ },
  "23fe9baa52ec5cecc9ce252b3421c281d0469f2c": {
   "en": "Factory worker",
   "src": "A02",
@@ -20783,6 +20898,11 @@
   "en": "{count, plural, one {Received a GitHub event} other {Received # GitHub events}}",
   "src": "C21",
   "zh": "{count, plural, one {已收到一則 GitHub 事件} other {已收到 # 則 GitHub 事件}}"
+ },
+ "246a49d7ac608242dd0a02a3d4dea8ef7aa43956": {
+  "en": "{count, plural, one {File already exists} other {# files already exist}}",
+  "src": "manual",
+  "zh": "{count, plural, one {檔案已存在} other {# 個檔案已存在}}"
  },
  "246aa2edbbae28bc4d2109e2ee96d0baf5eb0fff": {
   "en": "Successfully connected to Google Drive",
@@ -21348,6 +21468,11 @@
   "en": "Search or enter owner/repo",
   "src": "B06",
   "zh": "搜尋或輸入擁有者／儲存庫"
+ },
+ "25401f396fb0daec8936ff0b1b39b01bcc8f05a1": {
+  "en": "The largest pool pays. Equal budgets: the group whose spend limit was set up first pays.",
+  "src": "manual",
+  "zh": "由最大的集區支付。預算相同時：由最先設定支出上限的群組支付。"
  },
  "25430de6d595b6a2980397c44988683dafa4cb0b": {
   "en": "Thanks again for sharing",
@@ -22664,6 +22789,11 @@
   "src": "manual",
   "zh": "例如：您是 Acme Corp 的 Slack 助理。請優先給出簡潔的答案，並在相關時附上內部文件的連結。"
  },
+ "279a57b9a85377283820c5e159c5a64204d1d1c9": {
+  "en": "#{number}, {state}, {title}",
+  "src": "manual",
+  "zh": "#{number}，{state}，{title}"
+ },
  "279a6edf44feb425281ae9645aeee76f8f59d17d": {
   "en": "Allowed sites",
   "src": "A00",
@@ -22834,6 +22964,11 @@
   "src": "manual",
   "zh": "已為所有人、所有檔案停用增益集功能。addin.access 會關閉增益集。"
  },
+ "27e211cb75bebd588d8262d35644e5254d40548c": {
+  "en": "Details for this sync aren’t available.",
+  "src": "manual",
+  "zh": "無法取得此同步的詳細資料。"
+ },
  "27e3c5188d42f2eff8beccd4fea9d0ffbda2c308": {
   "en": "Browser settings",
   "src": "A00",
@@ -22923,6 +23058,11 @@
   "en": "{ratio, number, ::percent} used",
   "src": "manual",
   "zh": "已使用 {ratio, number, ::percent}"
+ },
+ "280e04ea5cfb06ef9087871c2d3d54796bbc643f": {
+  "en": "That folder is a protected location ({denied}) and can’t be used here. Choose a different folder.",
+  "src": "manual",
+  "zh": "該資料夾屬於受保護的位置（{denied}），無法在此使用。請選擇其他資料夾。"
  },
  "28107fa9e36a607353832bfcb14fa38665c1a0a3": {
   "en": "Send feedback, report a bug, or share your session",
@@ -23438,6 +23578,11 @@
   "en": "Refund usage credits only",
   "src": "B06",
   "zh": "僅退還用量點數"
+ },
+ "290f6f0c78399148ab41df3fee0da36f08764d41": {
+  "en": "This project and its threads will be permanently deleted. This can’t be undone.",
+  "src": "manual",
+  "zh": "此專案及其討論串將永久刪除。此操作無法復原。"
  },
  "2911b53987ef9d801afdff102135cca92866d54b": {
   "en": "Couldn't load developer settings",
@@ -25594,6 +25739,11 @@
   "src": "A00",
   "zh": "Alt+Space"
  },
+ "2cf2b6cb092fb10952919f1b747f0e5948313b02": {
+  "en": "Directory paths with spaces can’t be scanned. Choose a different directory.",
+  "src": "manual",
+  "zh": "含空格的目錄路徑無法掃描。請選擇其他目錄。"
+ },
  "2cf3b173e2b470bbc9323dc3fdf84c88ce7dd028": {
   "en": "Your organization has unlimited seats. Contact support to add other seat types.",
   "src": "C19",
@@ -27249,6 +27399,11 @@
   "src": "C05",
   "zh": "說明您平常的工作流程，以及您使用哪些 Claude 產品（聊天、API、Claude Code）。"
  },
+ "2fed1a2ca2c1e78471499eb1a966e676c3a254ad": {
+  "en": "Sending message",
+  "src": "manual",
+  "zh": "正在傳送訊息"
+ },
  "2fed6a9dfc372ef1106cbb6db4508d210651a127": {
   "en": "Why recurring scans are paused",
   "src": "manual",
@@ -28129,10 +28284,20 @@
   "src": "C11",
   "zh": "設定用戶端密鑰時為必填。若為 mcp.box.com，請使用 [\"https://api.box.com\"]。"
  },
+ "3149896f12502a997030c49b4582d6d1a09f2bdc": {
+  "en": "Requesting access to {apps}",
+  "src": "manual",
+  "zh": "正在要求 {apps} 的存取權"
+ },
  "314d90e101306e25a7374026448c3a14b2435ebf": {
   "en": "You will be receiving an email shortly with the next steps to set up your organization.",
   "src": "C18",
   "zh": "您將很快收到一封電子郵件，內含設定貴組織的後續步驟。"
+ },
+ "314f5446be88834fbd138582bfaaabac21c175c7": {
+  "en": "Couldn’t upload right now",
+  "src": "manual",
+  "zh": "目前無法上傳"
  },
  "31502142f8a774e5ace2b8d9c4c8a96547d930b5": {
   "en": "Map & fix a process",
@@ -29054,6 +29219,11 @@
   "src": "manual",
   "zh": "Anthropic 將閱讀你的回覆，以協助我們瞭解 AI 如何影響人們的生活。接下來，讓我們："
  },
+ "32d4b1c947ba924c837e429282166f7b25d2d9fe": {
+  "en": "{others, plural, one {# folder was skipped because it’s in a protected location.} other {# folders were skipped because they’re in a protected location.}}",
+  "src": "manual",
+  "zh": "{others, plural, one {有 # 個資料夾因位於受保護的位置而被略過。} other {有 # 個資料夾因位於受保護的位置而被略過。}}"
+ },
  "32d59de28a9baa5dfee95ea7f2302f5a8b224665": {
   "en": ": on",
   "src": "A00",
@@ -29924,6 +30094,11 @@
   "src": "A02",
   "zh": "啟用例行任務"
  },
+ "346db97abb4b7c11570caa9df6e4080e8c3af442": {
+  "en": "Threads in this project will be archived and become read-only.",
+  "src": "manual",
+  "zh": "此專案中的討論串將會封存並變成唯讀。"
+ },
  "347150b23c31a73454626f8347336e4c2731f914": {
   "en": "Create a self-hosted environment",
   "src": "B02",
@@ -30389,6 +30564,11 @@
   "src": "manual",
   "zh": "此例行任務無法存取其儲存庫。請向儲存庫管理員申請存取權、請您的 GitHub 組織管理員將其加入 Claude GitHub App，或在「設定」中重新連接 GitHub，然後重新啟用此例行任務。"
  },
+ "3534999e053a10f77a3d27576c2ca8b4940aaa93": {
+  "en": "Loading tools",
+  "src": "manual",
+  "zh": "正在載入工具"
+ },
  "3535c2fbd97cac6544f8a87f96595cd52e490e6e": {
   "en": "Join this project to see its conversations. Created by {creator}.",
   "src": "C08",
@@ -30624,6 +30804,11 @@
   "src": "B02",
   "zh": "將同一堂課設計成三種教法"
  },
+ "35b51b3084a160881ccde0cf3ce53a2034a477d0": {
+  "en": "Choosing {path}",
+  "src": "manual",
+  "zh": "正在選擇 {path}"
+ },
  "35b7811e686a22776440c143e058ec90ce195fea": {
   "en": "Failed to {action}",
   "src": "A02",
@@ -30728,6 +30913,11 @@
   "en": "Extension {extensionId} is blocked by a security blocklist: {reason}",
   "src": "C06",
   "zh": "擴充功能 {extensionId} 遭安全性封鎖清單封鎖：{reason}"
+ },
+ "35eeb4246a88571478c1ec33e2b6e1ac302a987e": {
+  "en": "Try it now",
+  "src": "manual",
+  "zh": "立即試用"
  },
  "35eeb496e7e7469b38461bf93410db26f4798005": {
   "en": "Couldn’t generate summary — click to retry",
@@ -31634,6 +31824,11 @@
   "src": "B01",
   "zh": "正在連接到連接器…"
  },
+ "37a04420afbe163ff1a9148c93bbb505fe6d0d96": {
+  "en": "{answered} of {total} answered",
+  "src": "manual",
+  "zh": "已回答 {answered} / {total}"
+ },
  "37a13d65c26257d229d368dc654f105924b22320": {
   "en": "OTLP endpoint",
   "src": "A04",
@@ -32094,6 +32289,11 @@
   "src": "manual",
   "zh": "擷取作業的驗證方式：匿名、使用者的 git 認證資訊、透過輔助執行檔，或如同應用程式對其閘道或啟動伺服器（url）的驗證方式。"
  },
+ "386beace6c215422a7153b36650d22724a50fd88": {
+  "en": "Pause video",
+  "src": "manual",
+  "zh": "暫停影片"
+ },
  "386e563d6cc3035d32b7228d3eaed81000d0d193": {
   "en": "Microsoft Entra Conditional Access is blocking {serverName}. Ask your IT admin to review Conditional Access policies for this app.",
   "src": "C09",
@@ -32103,6 +32303,11 @@
   "en": "Browse skills",
   "src": "A00",
   "zh": "瀏覽技能"
+ },
+ "387567d3b7bd42f61d3c982f0b73984d52077544": {
+  "en": "Add to Claude",
+  "src": "manual",
+  "zh": "新增至 Claude"
  },
  "387600f047af1ccb4c6e5a4de408434f2de3f073": {
   "en": "Work out who I meet with most, then summarize our last few conversations: what we discussed, what was promised in each direction, and what’s still open between us.",
@@ -33604,6 +33809,11 @@
   "src": "A08",
   "zh": "· {count}"
  },
+ "3b25319de3ea5c2214390a273ef4342d41c2443b": {
+  "en": "Requesting app access",
+  "src": "manual",
+  "zh": "正在要求應用程式存取權"
+ },
  "3b25d25e14ccc68a8b6a800bb8fbb4d40afad56e": {
   "en": "Read my eval metrics",
   "src": "A05",
@@ -33618,6 +33828,11 @@
   "en": "Sending message…",
   "src": "A06",
   "zh": "傳送訊息中…"
+ },
+ "3b2dd37c867cb55ce7c009a43988f3a0cf0ee108": {
+  "en": "Directory paths with spaces can’t be scanned. Choose a different directory, or clear the field to scan the entire repository.",
+  "src": "manual",
+  "zh": "含有空格的目錄路徑無法掃描。請改選其他目錄，或清空此欄位以掃描整個儲存庫。"
  },
  "3b30e3102338a4ecf96702f7101b8925e1f05efd": {
   "en": "The key file set for {host} is a PuTTY .ppk, which ssh can’t read. In PuTTYgen choose Conversions → Export OpenSSH key, then use that file instead.",
@@ -33973,6 +34188,11 @@
   "en": "This file isn’t available to preview.",
   "src": "B07",
   "zh": "此檔案無法預覽。"
+ },
+ "3be8f50351191de3848f6e210236a3df0f4821e1": {
+  "en": "Checking command output",
+  "src": "manual",
+  "zh": "正在檢查指令輸出"
  },
  "3bea5c29c3d308a61df23ee3bac24def0e9f71ed": {
   "en": "Hide steps",
@@ -34579,6 +34799,11 @@
   "src": "C04",
   "zh": "目前無法確認這台電腦的身分，因此您的變更未被儲存。您可以再試一次。"
  },
+ "3d0703458cae1d9d4291d5c91de9b2e838794d14": {
+  "en": "Opening {app}",
+  "src": "manual",
+  "zh": "正在開啟 {app}"
+ },
  "3d086422d7777645445695ebf5667a94e733a294": {
   "en": "Trademark infringement",
   "src": "B08",
@@ -34598,6 +34823,11 @@
   "en": "Reveal {count, plural, one {secret} other {secrets}}",
   "src": "B06",
   "zh": "顯示 {count, plural, one {密鑰} other {密鑰}}"
+ },
+ "3d143870194fb08d9fd9d0e902896fb035b78f83": {
+  "en": "Upload remaining {count, number}",
+  "src": "manual",
+  "zh": "上傳剩餘 {count, number} 個"
  },
  "3d16412312fad6f2156263933189d4242d96b338": {
   "en": "No one can reach the Anthropic team yet. Add a group or include admins and owners.",
@@ -34814,6 +35044,11 @@
   "src": "B02",
   "zh": "已刪除排程任務"
  },
+ "3d75ca68ff7a27f0f3877906f7ba0b74d9977d71": {
+  "en": "Each skill is scanned when you save",
+  "src": "manual",
+  "zh": "儲存時會掃描每個技能"
+ },
  "3d7a1e0300c2a8b00eb4aea3fcdc403b72e95f64": {
   "en": "Career coach",
   "src": "A01",
@@ -34863,6 +35098,11 @@
   "en": "Chapter title",
   "src": "A01",
   "zh": "章節標題"
+ },
+ "3d956b0d2f80d8dbefdc9b07bca3262966556c48": {
+  "en": "‘Always allow’ is disabled for Cowork by your organization admin. It is still available in Chat mode.",
+  "src": "manual",
+  "zh": "您的組織管理員已為 Cowork 停用「永遠允許」。在聊天模式中仍可使用。"
  },
  "3d95c69bceb7e4d9df31d19d074fde7d21ddf181": {
   "en": "Reset experience tracking data to re-trigger experiences. Local state is in sessionStorage; the per-row Reset buttons also clear the matching server exposure record.",
@@ -35068,6 +35308,11 @@
   "en": "Could not load developer settings",
   "src": "B01",
   "zh": "無法載入開發人員設定"
+ },
+ "3dea79ec459bdaf9a3b5c3c7e66340aa97742536": {
+  "en": "{date}, new messages",
+  "src": "manual",
+  "zh": "{date}，新訊息"
  },
  "3deb7456519697ecf4eefc455516c969a3681bae": {
   "en": "Type",
@@ -35289,6 +35534,11 @@
   "src": "B02",
   "zh": "撰寫有效的求職信"
  },
+ "3e4c03dcf665c6b912e951b7e0f505cd2a720ed3": {
+  "en": "Couldn’t use your computer",
+  "src": "manual",
+  "zh": "無法操作您的電腦"
+ },
  "3e50ed9da8dd45b2278119aa2641addb81a34ec9": {
   "en": "Copy saved to your artifacts.",
   "src": "manual",
@@ -35323,6 +35573,11 @@
   "en": "Uncommitted changes on <b>{currentBranch}</b>",
   "src": "B08",
   "zh": "<b>{currentBranch}</b> 上有未提交的變更"
+ },
+ "3e5fc2454f3468cf2bae2ac176a0e486b4696aab": {
+  "en": "Opening app",
+  "src": "manual",
+  "zh": "正在開啟應用程式"
  },
  "3e61c385da48a0b9aaafb059ecf78e4c2f86d67d": {
   "en": "Absolute path to the server executable, run on the user’s machine.",
@@ -35469,6 +35724,11 @@
   "src": "A08",
   "zh": "讀取頁面內容於"
  },
+ "3eaba21662c9f0b7e38bcf76431361dba4782eca": {
+  "en": "Uploading file",
+  "src": "manual",
+  "zh": "正在上傳檔案"
+ },
  "3eaee94a3f2acd4870a5e1d256d21a06e4eb9558": {
   "en": "Its process was ended on {host} — most often because that machine ran out of memory. Choose Try again to pick the conversation up where it left off.",
   "src": "manual",
@@ -35528,6 +35788,11 @@
   "en": "Allow team members to share skills with each other.",
   "src": "B00",
   "zh": "允許團隊成員互相分享技能。"
+ },
+ "3ecdc94ec72fe6ee9278ea7a3608ad2710028633": {
+  "en": "Anything that doesn’t fit the categories above.",
+  "src": "manual",
+  "zh": "不屬於上述類別的任何問題。"
  },
  "3ecf3a26a2476029e99af7a26d1912f359f95bf9": {
   "en": "Could not connect to the marketplace. Check the URL and your network connection.",
@@ -35829,6 +36094,11 @@
   "src": "manual",
   "zh": "更新訪客存取權失敗，請再試一次。"
  },
+ "3f6b64b822f39edc77bfe2d132a7cc4351a15d34": {
+  "en": "This file type can’t be downloaded.",
+  "src": "manual",
+  "zh": "無法下載此檔案類型。"
+ },
  "3f6cac28160d77585d0b7078743549e9d6ea363e": {
   "en": "You’ve used {pct} of your {model} limit · Resets {day} at {time}",
   "src": "C20",
@@ -35939,6 +36209,11 @@
   "src": "manual",
   "zh": "開啟例行任務"
  },
+ "3f9ac80c0b320a54e8f89632ecbcd3c5b7cabe15": {
+  "en": "Set up centralized management",
+  "src": "manual",
+  "zh": "設定集中管理"
+ },
  "3f9b8e15523ce7e07d93bbfb551b7d6318719872": {
   "en": "Windows update required",
   "src": "B08",
@@ -36038,6 +36313,11 @@
   "en": "You can still continue previous chats that reference {integrationName} content. However, Claude won’t be able to access new content or perform new tasks.",
   "src": "C18",
   "zh": "您仍可繼續先前引用 {integrationName} 內容的對話，但 Claude 將無法存取新內容或執行新任務。"
+ },
+ "3fbd04d6e28ce4e4b1c0568c6d084eeb4564fc81": {
+  "en": "Expand table",
+  "src": "manual",
+  "zh": "展開表格"
  },
  "3fbec5e7e72fd835334e74fd3ef1bc537b69f800": {
   "en": "Install Claude Code in your terminal or IDE",
@@ -36248,6 +36528,11 @@
   "en": "Couldn’t load shared content. Refresh and try again.",
   "src": "B02",
   "zh": "無法載入已分享的內容，請重新整理並再試一次。"
+ },
+ "400abb2187a59bbfb40dd63162d2bee5e5134416": {
+  "en": "Get app",
+  "src": "manual",
+  "zh": "取得應用程式"
  },
  "400bdaa1700505d938b9c220b373d05ba07df582": {
   "en": "Look at my sent mail from the past two weeks and find up to three threads where I asked for something and never heard back. Draft a short, friendly nudge for each and save them as Gmail drafts, ready to send.",
@@ -38389,6 +38674,11 @@
   "src": "C09",
   "zh": "之後從您的身分提供者同步的成員，可能會使此角色的人數超過 {grant} 授權所訂的 {cap} 人上限，進而導致此角色所有成員的該授權遭到暫停。"
  },
+ "43b8fdd7abe6baa69c9dd138003fa48dcad00168": {
+  "en": "Billing migration",
+  "src": "manual",
+  "zh": "帳單移轉"
+ },
  "43baaa37c9e1f7fbdaba27e37be5c98e647d33c9": {
   "en": "{used} of {limit}",
   "src": "A08",
@@ -38498,6 +38788,11 @@
   "en": "Connect Slack and Google Workspace services",
   "src": "B01",
   "zh": "連接 Slack 與 Google Workspace 服務"
+ },
+ "4401f7a8223ccc663ea336e8f50bb95562a63863": {
+  "en": "Shallow research",
+  "src": "manual",
+  "zh": "淺層研究"
  },
  "4402ebda1b5a5d2ad98c82b54ac7f674d9a435a3": {
   "en": "Memory update retried.",
@@ -39568,6 +39863,11 @@
   "en": "Active overrides table, add by name, and URL overrides.",
   "src": "B00",
   "zh": "使用中覆寫表格，可依名稱新增與網址覆寫。"
+ },
+ "45d05753c58826507641ade418b4d4703fb56764": {
+  "en": "{count, plural, one {{name} already exists. Replace it?} other {These files already exist. Replace them?}}",
+  "src": "manual",
+  "zh": "{count, plural, one {{name} 已存在。要取代嗎？} other {這些檔案已存在。要取代嗎？}}"
  },
  "45d39c7866504b28b588a2557393d6ad6a537148": {
   "en": "Rename failed. You can try again.",
@@ -40753,6 +41053,11 @@
   "en": "{count, plural, one {{modelNames} is off for the organization. Enable it in Models, or remove it here.} other {{modelNames} are off for the organization. Enable them in Models, or remove them here.}}",
   "src": "C21",
   "zh": "{count, plural, one {{modelNames} 已為組織關閉。請在「模型」中啟用，或在此處移除。} other {{modelNames} 已為組織關閉。請在「模型」中啟用，或在此處移除。}}"
+ },
+ "47c47842803b68a7038bb1b1deff963c34ee19f8": {
+  "en": "Back to questions",
+  "src": "manual",
+  "zh": "返回問題"
  },
  "47c74f5ab8dde7a76bbb3f07995894e42ffaf217": {
   "en": "Link destination",
@@ -42094,10 +42399,20 @@
   "src": "C16",
   "zh": "此技能包含無法在這裡編輯的其他檔案或中繼資料。請使用「取代」上傳新版本。"
  },
+ "4a1e62914bcb388ef610295ca568d2fed6f4ef71": {
+  "en": "Survey pages",
+  "src": "manual",
+  "zh": "問卷頁面"
+ },
  "4a1ee65e2301585321e03b360bf3a16cd9bcf9ef": {
   "en": "Couldn’t load your request status. You can still send a request.",
   "src": "manual",
   "zh": "無法載入你的要求狀態，你仍然可以送出要求。"
+ },
+ "4a22a13231c46c219a30f529b40cb0cf5b58064c": {
+  "en": "Drag and drop skill files here, or browse — you can add several at once",
+  "src": "manual",
+  "zh": "將技能檔案拖放到這裡，或瀏覽選取——可一次新增多個"
  },
  "4a23b1c31d090ab66d9bb511532ce6758856e09c": {
   "en": "Calibration couldn’t be saved. Try again.",
@@ -42538,6 +42853,11 @@
   "en": "Keep both accounts",
   "src": "manual",
   "zh": "保留兩個帳戶"
+ },
+ "4ae2cc1c610cea023caf096e5d96eaef1491dc1d": {
+  "en": "Uploaded {count, number} of {total, plural, one {# skill} other {# skills}}",
+  "src": "manual",
+  "zh": "已上傳 {count, number} / {total, plural, one {# 個技能} other {# 個技能}}"
  },
  "4ae6899e29a7b3586bad6d047f46d9535a0a16be": {
   "en": "Connect GitHub Enterprise",
@@ -44644,6 +44964,11 @@
   "src": "A02",
   "zh": "整個儲存庫"
  },
+ "4e8687bf0e8227165e5cff6163b1991640749e85": {
+  "en": "Add skills to your workspace.",
+  "src": "manual",
+  "zh": "將技能新增至您的工作區。"
+ },
  "4e86f33e1a5d1133b50ef3a904297f2137662dae": {
   "en": "You’ve allowed this folder before. Continue to add it to this session.",
   "src": "C20",
@@ -44908,6 +45233,11 @@
   "en": "Unable to load queued sessions. Try again later.",
   "src": "B08",
   "zh": "無法載入佇列中的工作階段，請稍後再試。"
+ },
+ "4ef474a5d3fcc469dbd31be88dc3250e661685a5": {
+  "en": "Play video",
+  "src": "manual",
+  "zh": "播放影片"
  },
  "4ef5c5e585fc186893d0112c6bf8804e0da301ea": {
   "en": "{count, plural, one {Removing # role.} other {Removing # roles.}}",
@@ -45583,6 +45913,11 @@
   "en": "add {count, number}",
   "src": "A08",
   "zh": "新增 {count, number}"
+ },
+ "50213704433e30ff7120161317113b98b0958a14": {
+  "en": "Running code",
+  "src": "manual",
+  "zh": "正在執行程式碼"
  },
  "5021eea691ad4a7b22edadf57b26f27be2c5a90e": {
   "en": "Couldn’t read the uploaded file. Re-upload the plugin to try again.",
@@ -47764,6 +48099,11 @@
   "src": "A07",
   "zh": "檢視留言"
  },
+ "53fbee3c89ee5637fb7feba488327c50f98d8658": {
+  "en": "Your organization’s encryption key is unavailable. Restore access to the key, then sync again.",
+  "src": "manual",
+  "zh": "您組織的加密金鑰無法使用。請還原對該金鑰的存取權，然後重新同步。"
+ },
  "53fd7662b9ee45e28269f17c14b1fb7478044403": {
   "en": "Creates a new artifact from an artifact type; its page was written by that type’s publisher.",
   "src": "manual",
@@ -48248,6 +48588,11 @@
   "en": "{count, plural, one {The worktree is still on disk. Unarchive the session to keep working in it.} other {The worktrees are still on disk. Unarchive the sessions to keep working in them.}}",
   "src": "manual",
   "zh": "{count, plural, one {該 worktree 仍在磁碟上。取消封存該工作階段即可繼續在其中作業。} other {那些 worktree 仍在磁碟上。取消封存那些工作階段即可繼續在其中作業。}}"
+ },
+ "54c4f4e4bc168b6471ec87f0b3a1c7b303d5b7b4": {
+  "en": "Your connectors are ready. Ask Claude to prep you for your next call, review your pipeline for risks, or turn call notes into follow-ups.",
+  "src": "manual",
+  "zh": "您的連接器已就緒。可以請 Claude 為您準備下一場通話、檢視業務管道中的風險，或把通話筆記整理成後續事項。"
  },
  "54c548bde360de64098f24bc19a2c520c39fc308": {
   "en": "{ready, plural, one {# of {count} plugins from {marketplaceName} is ready to use.} other {# of {count} plugins from {marketplaceName} are ready to use.}} {undecided, plural, one {# couldn’t be reviewed. Check it before using.} other {# couldn’t be reviewed. Check them before using.}}",
@@ -49898,6 +50243,11 @@
   "en": "Removing…",
   "src": "A05",
   "zh": "移除中…"
+ },
+ "57a17080222c642fa48e84429dad5751d631d76c": {
+  "en": "Save {count, plural, one {# skill} other {# skills}}",
+  "src": "manual",
+  "zh": "儲存 {count, plural, one {# 個技能} other {# 個技能}}"
  },
  "57a3b796517b0856b648d6c1b1f0667997a0784c": {
   "en": "Permission set by your admin",
@@ -51649,6 +51999,11 @@
   "src": "B06",
   "zh": "查看較長任務的進度。"
  },
+ "5a8d95db6fc0653d8768bcc13d4c8880f3ebeb9f": {
+  "en": "This app suggests connecting {serverName}",
+  "src": "manual",
+  "zh": "此應用程式建議連接 {serverName}"
+ },
  "5a8f23f567cd8706b03394c1de212addf49e9d10": {
   "en": "Risk",
   "src": "A06",
@@ -51798,6 +52153,11 @@
   "en": "Use Anthropic’s recommended defaults",
   "src": "B08",
   "zh": "使用 Anthropic 建議的預設值"
+ },
+ "5ae5bfcc5ae9fdaba2d72def06081df6db96bdcb": {
+  "en": "A skill named {skillName} already exists",
+  "src": "manual",
+  "zh": "已有名為 {skillName} 的技能"
  },
  "5ae5c422665537192cfe58be4102ed101faa265c": {
   "en": "all time",
@@ -52528,6 +52888,11 @@
   "en": "Xcode not found. Install Xcode to use the Claude Code iOS Simulator.",
   "src": "C18",
   "zh": "找不到 Xcode。請安裝 Xcode 以使用 Claude Code iOS 模擬器。"
+ },
+ "5c5d2f85869878285108a98cc9c25feb13ef8661": {
+  "en": "Fetching URL",
+  "src": "manual",
+  "zh": "正在擷取網址"
  },
  "5c5d76af94469c7cb9599c22eacd4aa3c09515bd": {
   "en": "Your subscription is already set to cancel, so it can’t be paused.",
@@ -53818,6 +54183,11 @@
   "en": "Unable to load pool. Try again later.",
   "src": "B08",
   "zh": "無法載入集區，請稍後再試。"
+ },
+ "5ec2afd586dda0d98670917d9c7c387c81a121a1": {
+  "en": "Copy path {path}",
+  "src": "manual",
+  "zh": "複製路徑 {path}"
  },
  "5ec654f8863c9c81db7603c0c070d9574391a9b5": {
   "en": "Strategy consultant",
@@ -55174,6 +55544,11 @@
   "src": "B08",
   "zh": "無法完成此次購買。"
  },
+ "610a96b31c0ce9a2c5a5fa9b54e8d1710821a60c": {
+  "en": "Started for each skill as it was saved",
+  "src": "manual",
+  "zh": "已在每個技能儲存時啟動"
+ },
  "610cf53232664decac9ffab4e3cf226c8faf718c": {
   "en": "Manage usage credits",
   "src": "A04",
@@ -55683,6 +56058,11 @@
   "en": "Claude Code",
   "src": "A01",
   "zh": "Claude Code"
+ },
+ "61fa4d4e0a22315cec0dba69b1632099628e4e9f": {
+  "en": "Releasing control of your screen",
+  "src": "manual",
+  "zh": "正在釋放您的螢幕控制權"
  },
  "61fad162ea23ff99183a19c9fb4765065b401989": {
   "en": "Downloads packages from verified sources, balancing security and performance.",
@@ -56338,6 +56718,11 @@
   "en": "This opens a chat where Claude looks through your connected tools — calendar, email, docs, channels — finds the one thing it can take off your plate today, and finishes it. It asks before touching anything, the same way it does in any chat.",
   "src": "manual",
   "zh": "這會開啟一段聊天，Claude 會查看您已連接的工具——行事曆、電子郵件、文件、頻道——找出今天能為您卸下的一件事並完成它。動手處理前會先詢問您，和一般聊天的做法相同。"
+ },
+ "6342c504ebad623661964362bbda872ca2a1c3e8": {
+  "en": "Reading {menu} menu",
+  "src": "manual",
+  "zh": "正在讀取 {menu} 選單"
  },
  "6343c287528c30837fef2e21b3b003c56ebdf626": {
   "en": "Too many login attempts",
@@ -57103,6 +57488,11 @@
   "en": "Couldn’t add members. Personal projects can’t have members.",
   "src": "B02",
   "zh": "無法新增成員，個人專案不能有成員。"
+ },
+ "6461ef6e3e303370e270b10b3203f48447d85850": {
+  "en": "Copying to clipboard",
+  "src": "manual",
+  "zh": "正在複製到剪貼簿"
  },
  "64666508d39d27fe3d19b41e0069a8f11a34d3a2": {
   "en": "Connector not found",
@@ -58544,6 +58934,11 @@
   "src": "A01",
   "zh": "圖表"
  },
+ "66c98419dbb1f5c5913eaf27e96ef4160961dcdc": {
+  "en": "Open plugin details",
+  "src": "manual",
+  "zh": "開啟外掛程式詳細資料"
+ },
  "66cb3482719bd08f908ea1422648ea6b461bfa3a": {
   "en": "Product marketing manager",
   "src": "B06",
@@ -58738,6 +59133,11 @@
   "en": "For other edits or escalations, email {email} or contact an AE. Debugging and alert channels can be set up on demand.",
   "src": "C06",
   "zh": "如需其他修改或升級處理，請寄送電子郵件至 {email} 或聯絡客戶經理（AE）。偵錯與警示頻道可依需求設定。"
+ },
+ "67287d8fbc90098c2956abe943bfdce17c26e5e8": {
+  "en": "Closing file",
+  "src": "manual",
+  "zh": "正在關閉檔案"
  },
  "672f54630e727415bcdffa59c46b9bf7d74c824f": {
   "en": "Talk it through with Claude",
@@ -59028,6 +59428,11 @@
   "en": "Usage credit requests turned on",
   "src": "B08",
   "zh": "已開啟用量點數要求"
+ },
+ "678b3e32145ec6a9c35ae4715d0bff445c25f217": {
+  "en": "Share guest passes",
+  "src": "manual",
+  "zh": "分享訪客通行證"
  },
  "678b97796d89866c4338da6d01fa38b006a3b89e": {
   "en": "Configuration deprecation warning",
@@ -59929,6 +60334,11 @@
   "src": "manual",
   "zh": "輸入州/省"
  },
+ "691c2cbb717309665b8e8e3f6e73f5d24387353d": {
+  "en": "Pin to sidebar",
+  "src": "manual",
+  "zh": "釘選到側邊欄"
+ },
  "691d1263184eddf4142f017d349b5bd8d0fd4b2a": {
   "en": "Also include <link>default list</link> of common package managers",
   "src": "C01",
@@ -59943,6 +60353,11 @@
   "en": "Verifying…",
   "src": "A07",
   "zh": "驗證中…"
+ },
+ "69209cff55dac970320f56af8cb0f1fd23d2adb4": {
+  "en": "If your organization allows it, this task will use the computer this conversation is tied to ({deviceName}), including its local folders and Claude in Chrome; otherwise it will run in the cloud only.",
+  "src": "manual",
+  "zh": "若您的組織允許，此任務會使用這個對話所綁定的電腦（{deviceName}），包括它的本機資料夾與 Claude in Chrome；否則只會在雲端執行。"
  },
  "6923ba29207baf026769031c5f843f2f6aa89806": {
   "en": "Write up my analysis like a paper",
@@ -59973,6 +60388,11 @@
   "en": "Block nonessential telemetry",
   "src": "B00",
   "zh": "封鎖非必要遙測資料"
+ },
+ "69390e166570e5e9ba13ae3602feaa0111f2685b": {
+  "en": "Campaign",
+  "src": "manual",
+  "zh": "行銷活動"
  },
  "693ae7275c6f2f6a6df4b64902e0ea9fc461471c": {
   "en": "Run a legal checkup on my business: ask me five quick questions — structure, contracts, employees, IP, data — then rank where I’m most exposed and name the one document I should fix first.",
@@ -61524,6 +61944,11 @@
   "src": "manual",
   "zh": "此版本未通過安全性掃描，因此無法提供服務。"
  },
+ "6bf24dd14d046ab18d5871343cabbd2ec3ecc850": {
+  "en": "Scheduled tasks in the cloud",
+  "src": "manual",
+  "zh": "雲端排程任務"
+ },
  "6bf5f37d5383e3586f67e22a49ceeea9b2675c89": {
   "en": "“{taskName}” now runs on this computer, but the cloud copy couldn’t be removed. It’s paused — delete it from the task list.",
   "src": "C21",
@@ -61678,6 +62103,11 @@
   "en": "Premium",
   "src": "A05",
   "zh": "進階"
+ },
+ "6c314b4a66aecb42ac9a0626fd18ea233649ae24": {
+  "en": "A security scan runs on each one when you save.",
+  "src": "manual",
+  "zh": "儲存時會對每一個執行安全掃描。"
  },
  "6c32ea11fa52d948c9ed40a4387b23ce1313676d": {
   "en": "Covers authentication (SSO and provisioning), domains, security, IP allowlist, organization merging, groups, custom roles, and grants.",
@@ -62693,6 +63123,11 @@
   "en": "Generate gift or travel ideas",
   "src": "B04",
   "zh": "產生禮物或旅遊點子"
+ },
+ "6dda9ef583d11bf06330970870164e714c846fb5": {
+  "en": "Share feedback on this model",
+  "src": "manual",
+  "zh": "分享對此模型的意見回饋"
  },
  "6ddacfb125d3d8a782f1167816604733d543ba72": {
   "en": "Whiteboard a system design with me. I’ll name the thing to build; ask me about scale and constraints, then sketch the architecture, call out the hard parts, and compare two approaches for the riskiest piece.",
@@ -63733,6 +64168,11 @@
   "en": "Open the setup page. It shows the TXT record to add.",
   "src": "manual",
   "zh": "開啟設定頁面，其中會顯示要新增的 TXT 記錄。"
+ },
+ "6fbeb053744aa5131ed866fd4700b9c840c89960": {
+  "en": "Sprint tracker",
+  "src": "manual",
+  "zh": "衝刺追蹤器"
  },
  "6fbef407594d17b1831c556f2f63043de5e51996": {
   "en": "Anyone in {scope} can view",
@@ -65704,6 +66144,11 @@
   "src": "A04",
   "zh": "訊息工作階段"
  },
+ "730e1584335c170a176205427b36ff7aeafb494a": {
+  "en": "Failed to load tools",
+  "src": "manual",
+  "zh": "載入工具失敗"
+ },
  "730f2a945c6d8c9f1bc57000db6be7ce98f23745": {
   "en": "Applying changes from this chat isn’t available yet",
   "src": "B00",
@@ -66093,6 +66538,11 @@
   "en": "Annual billing unavailable",
   "src": "B00",
   "zh": "無法使用年繳"
+ },
+ "73ab71d664619fda0c3f79a4baf7ea6c5525f0fa": {
+  "en": "Updating file",
+  "src": "manual",
+  "zh": "正在更新檔案"
  },
  "73afeafc8a9416706bb5d871d158759b03d8bd6e": {
   "en": "You’re connecting from {ip}, which is outside the allowlist.",
@@ -67124,6 +67574,11 @@
   "src": "manual",
   "zh": "{field} 的提議已婉拒"
  },
+ "75780dd3388d53a51364740715124d3fb4876c3b": {
+  "en": "You’ve got a guest pass",
+  "src": "manual",
+  "zh": "您獲得了一張訪客通行證"
+ },
  "75794e67d6c69066ee399ea6af97b363363867fa": {
   "en": "Upgrade to Max 20x",
   "src": "A07",
@@ -67269,6 +67724,11 @@
   "src": "C21",
   "zh": "{domain} 不是有效的電子郵件網域，有效網域格式應為 example.com"
  },
+ "75abb9272e272a0d91138b7c7ac4df54850d3188": {
+  "en": "Couldn’t perform browser actions",
+  "src": "manual",
+  "zh": "無法執行瀏覽器操作"
+ },
  "75ac1bc6604d6d2aa976c9ac39f7f45e88c4e48d": {
   "en": "Allow Claude to remember relevant context from your chats and Cowork sessions. This setting also applies to projects. <a>Learn more</a>.",
   "src": "C01",
@@ -67333,6 +67793,11 @@
   "en": "Ask Claude to keep an up to date notebook of your open PRs, pending decisions, and open questions for you.",
   "src": "C01",
   "zh": "請 Claude 為您保留一份即時更新的筆記，記錄您未結的 Pull Request、待決事項和未解決的問題。"
+ },
+ "75cfb155f5cc780c3a21740125beba7b35706699": {
+  "en": "Fable 5.1 will be allowed and set as default anywhere Fable 5 is. If you’d rather manage it separately, opt out in Organization settings. Fable 5.1 will then keep its own access and default status, which you can adjust yourself anytime.",
+  "src": "manual",
+  "zh": "Fable 5.1 會在所有允許 Fable 5 的地方一併獲得允許並設為預設。若您想分開管理，請在「組織設定」中選擇退出；之後 Fable 5.1 會保有自己的存取權與預設狀態，您隨時可以自行調整。"
  },
  "75d50c2686a26db61122b30f36d736f461a79f1a": {
   "en": "An error occurred while deleting your account. Please try again or contact support.",
@@ -67403,6 +67868,11 @@
   "en": "Type in something like: A doc, a reply, a plan, a summary…",
   "src": "manual",
   "zh": "請輸入類似：一份文件、一則回覆、一份計畫、一份摘要…"
+ },
+ "75fb2b10fc3a44733a137c11ce19120fe8fa4495": {
+  "en": "Reading file",
+  "src": "manual",
+  "zh": "正在讀取檔案"
  },
  "75fbc3c0f420693bca6277156d33f1b950c631d6": {
   "en": "The built-in browser couldn’t start. Try again in a moment.",
@@ -68229,6 +68699,11 @@
   "src": "C09",
   "zh": "監控進度、在需要您時收到通知，並隨時隨地檢視變更。"
  },
+ "776b4a9a534eafbaba62e6f5f07f9e2331abd64f": {
+  "en": "Performed browser actions",
+  "src": "manual",
+  "zh": "已執行瀏覽器操作"
+ },
  "776eefb73f13683d2ed7a3c7631e1b5f9605d4d7": {
   "en": "Customize Cowork for me",
   "src": "B02",
@@ -68519,6 +68994,11 @@
   "src": "B03",
   "zh": "每個工作階段,從工作階段開始時起"
  },
+ "77facc8ed3d743539fb40705a3b348bd9e44f827": {
+  "en": "Next comment",
+  "src": "manual",
+  "zh": "下一則留言"
+ },
  "77fc1bad1500582f53255983f7c3b63f0f28194b": {
   "en": "resolve a comment thread on this artifact",
   "src": "manual",
@@ -68789,6 +69269,11 @@
   "src": "manual",
   "zh": "解析中…"
  },
+ "786f3c5becdeffb87d03a9027494c39d46dad536": {
+  "en": "Lost track of earlier decisions or contradicted its own previous work in the session.",
+  "src": "manual",
+  "zh": "忘記先前的決定，或與自己在此工作階段中先前的成果相互矛盾。"
+ },
  "787011b799ef0e3b3fac784e1a446e91f7c8f45b": {
   "en": "Your own account is in good standing, but {count, plural, one {an organization you belong to is on hold because we found signals it was used by someone under 18.} other {# organizations you belong to are on hold because we found signals they were used by someone under 18.}} Verify your age below to restore access.",
   "src": "C19",
@@ -69058,6 +69543,11 @@
   "en": "Loading domain verification status...",
   "src": "B04",
   "zh": "正在載入網域驗證狀態…"
+ },
+ "78d98a6fa6ae2b743942ba935a382a2e62af27d4": {
+  "en": "Running as each skill is saved",
+  "src": "manual",
+  "zh": "在每個技能儲存時執行"
  },
  "78da5cf4cac7fac420591dc0aa2890dfcee74baf": {
   "en": "Sent prompt",
@@ -70069,6 +70559,11 @@
   "src": "B08",
   "zh": "試試您的第一個 Cowork 任務"
  },
+ "7aa18495813154f9e531cc500e8ee3db1fcdc93f": {
+  "en": "Couldn’t confirm this marketplace’s encryption settings. Contact support.",
+  "src": "manual",
+  "zh": "無法確認此市集的加密設定。請聯絡支援。"
+ },
  "7aa594285001fa56d7685a02ee53f0a51e83beca": {
   "en": "{product} grant",
   "src": "A08",
@@ -70908,6 +71403,11 @@
   "en": "That worktree folder is not valid.",
   "src": "manual",
   "zh": "該 worktree 資料夾無效。"
+ },
+ "7c1e9529a8421bdc7282eb6c84e18b0bb1683dbc": {
+  "en": "Asking a question",
+  "src": "manual",
+  "zh": "正在提出問題"
  },
  "7c1eb82df0a88b5bc696d5670ebc8126e01844d7": {
   "en": "Browser is coming to Claude Code Desktop for your organization",
@@ -72078,6 +72578,11 @@
   "en": "Auto only runs locally",
   "src": "B00",
   "zh": "自動模式僅在本機執行"
+ },
+ "7e52bc2acb24748be4a211876803bda86f6373b8": {
+  "en": "Code on your phone",
+  "src": "manual",
+  "zh": "在手機上寫程式"
  },
  "7e568a90221d853052b3466e581eb5f7c030b901": {
   "en": "First name",
@@ -73258,6 +73763,11 @@
   "en": "Set the maximum permission users in your organization can grant for unlisted {cliName} commands. Users can choose a stricter setting, but not a looser one.",
   "src": "C12",
   "zh": "設定您組織中使用者對未列出的 {cliName} 指令，最多可授予的權限。使用者可以選擇更嚴格的設定，但不能選擇更寬鬆的設定。"
+ },
+ "8052a8c75a74a7df17b26b1e054869ac75e51928": {
+  "en": "This request expired. Ask Claude to try again.",
+  "src": "manual",
+  "zh": "此要求已逾期。請要求 Claude 再試一次。"
  },
  "8058509f09afd88a8c56ea60d5297a33eec69289": {
   "en": "Please review the terms of service",
@@ -75289,6 +75799,11 @@
   "src": "A04",
   "zh": "標誌"
  },
+ "83fe9390585a02de5d6c82c6ba5e967803859aac": {
+  "en": "Will link after this step",
+  "src": "manual",
+  "zh": "將於此步驟後連結"
+ },
  "840522507dd86088219541d7472a6efea9eb7362": {
   "en": "Move pane to top left",
   "src": "B05",
@@ -76819,6 +77334,11 @@
   "src": "manual",
   "zh": "你的大概位置（{country}）也會一併分享"
  },
+ "86bbe2e60db9ce3766e53ebec9d08380ea9239fb": {
+  "en": "Skip {fileName}",
+  "src": "manual",
+  "zh": "略過 {fileName}"
+ },
  "86bc5e2a2c89bd0b872da93abc27bc16eeaa3726": {
   "en": "Private/confidential information",
   "src": "B06",
@@ -77383,6 +77903,11 @@
   "en": "Zoom Out",
   "src": "A08",
   "zh": "縮小"
+ },
+ "87b0a883694caf11dab9515deae5b61982ce3098": {
+  "en": "Claude works directly in Outlook",
+  "src": "manual",
+  "zh": "Claude 可直接在 Outlook 中運作"
  },
  "87b85dca19e84067b9d33889a8d32c7dcd56347f": {
   "en": "Rotate",
@@ -78899,6 +79424,11 @@
   "src": "A01",
   "zh": "在網頁上聊天"
  },
+ "8a78b4998feeb4f409891d0eb1716fe3eb7a2c9a": {
+  "en": "Anyone with the link",
+  "src": "manual",
+  "zh": "知道連結的任何人"
+ },
  "8a7915b6fbb38559273dfebd3ddddd938fb16817": {
   "en": "Manage MCP connectors",
   "src": "B04",
@@ -79994,6 +80524,11 @@
   "src": "A05",
   "zh": "由 Claude 提供技術支援"
  },
+ "8c5dbf9daf7befd4a874c13d47be8e1ddc6277ea": {
+  "en": "Transport protocol for the OpenTelemetry exporters.",
+  "src": "manual",
+  "zh": "OpenTelemetry 匯出器使用的傳輸協定。"
+ },
  "8c60141b83798dc5ed1764f7177bf789bdae47d8": {
   "en": "Analyze literary themes",
   "src": "B00",
@@ -80284,6 +80819,11 @@
   "src": "B02",
   "zh": "從最美麗的錯誤中汲取靈感創作"
  },
+ "8cf9a36e012859c9fc3e36848fa5d7c787bb57b7": {
+  "en": "{count, plural, one {# file was} other {# files were}} left out: skill files must have a .skill, .zip, or .md file extension.",
+  "src": "manual",
+  "zh": "{count, plural, one {有 # 個檔案} other {有 # 個檔案}}被略過：技能檔案的副檔名必須是 .skill、.zip 或 .md。"
+ },
  "8cfafd4a6fb2247b25bf20582d5754109fe45b93": {
   "en": "Couldn’t refresh tools list. You can try again.",
   "src": "manual",
@@ -80368,6 +80908,11 @@
   "en": "{reason} <link>Contact sales</link> for more information.",
   "src": "B09",
   "zh": "{reason} 如需更多資訊，請<link>聯絡業務團隊</link>。"
+ },
+ "8d2e4112998b6342505965779f7a9bd8822d03ec": {
+  "en": "Finding elements",
+  "src": "manual",
+  "zh": "正在尋找元素"
  },
  "8d2e854179c4b6c43f9f2993efa08b1a337c2795": {
   "en": "Claude isn’t connected to GitHub for this organization. Connect Claude to GitHub to configure repository access.",
@@ -81719,6 +82264,11 @@
   "src": "A02",
   "zh": "儲存技能失敗"
  },
+ "8f755cacc012f3ae6a250281efb8fb882da66876": {
+  "en": "Managed by Routines in Claude Code settings.",
+  "src": "manual",
+  "zh": "由 Claude Code 設定中的例行任務管理。"
+ },
  "8f75a89d0ffc3b6a2db7de4ee28a17f2e4205aed": {
   "en": "Claude's installation appears to be corrupted. Reinstall Claude from claude.com/download to use this feature.",
   "src": "C04",
@@ -82274,6 +82824,11 @@
   "src": "manual",
   "zh": "請檢閱以下標記的外掛程式。"
  },
+ "90784f57f8c0d2e55432408fc2ecba766f7ef354": {
+  "en": "Not a skill file",
+  "src": "manual",
+  "zh": "不是技能檔案"
+ },
  "90787bd7df0831b006bf718f8a3cad15615bb039": {
   "en": "Claude Code analytics view",
   "src": "B01",
@@ -82773,6 +83328,11 @@
   "en": "Can’t resume the previous session.",
   "src": "B01",
   "zh": "無法繼續先前的工作階段。"
+ },
+ "91636769faa30d48a91fcdd2c876864e70d01f61": {
+  "en": "Reading clipboard",
+  "src": "manual",
+  "zh": "正在讀取剪貼簿"
  },
  "9164c7fbca53a0207c06c03e98e23e4e37ff4ef8": {
   "en": "· {count, plural, one {# prompt} other {# prompts}}",
@@ -83519,6 +84079,11 @@
   "src": "B09",
   "zh": "您的獎勵正在路上"
  },
+ "92b68b0bdc4f8eb00b84bf3c1bbb1d8b985b9d0e": {
+  "en": "Missing or wrong sources",
+  "src": "manual",
+  "zh": "來源缺漏或錯誤"
+ },
  "92b742d07ee9810ff6c9680d5d834a36d2a7d740": {
   "en": "Renew as monthly",
   "src": "A05",
@@ -83909,6 +84474,11 @@
   "src": "C03",
   "zh": "確認我的實驗能偵測到我要找的結果：我會用兩句話描述實驗設計──您估計合理的效應量範圍，攤開所有假設進行檢定力計算，並告訴我能讓審查者不再追問的樣本數。"
  },
+ "93545c0b71c4b5262677b140846fceed4b75d239": {
+  "en": "Switching display",
+  "src": "manual",
+  "zh": "正在切換顯示器"
+ },
  "935bb111351d42ab641b7d6f6d17719e2f9cff6e": {
   "en": "Suggesting a Claude Code session…",
   "src": "B07",
@@ -84289,6 +84859,16 @@
   "src": "A02",
   "zh": "忽略 {fileName}"
  },
+ "93f4426913706249e4ab24247bf555a4f5021f9b": {
+  "en": "This organization can enroll in centralized management.",
+  "src": "manual",
+  "zh": "此組織可加入集中管理。"
+ },
+ "93f9fe34f02e46c33371bbf3c9ca6cb2214b05d9": {
+  "en": "Capturing {app} window",
+  "src": "manual",
+  "zh": "正在擷取 {app} 視窗"
+ },
  "93fb098dcc0779e18f5eec0f35ecdb98daad7332": {
   "en": "SSH agent refused",
   "src": "manual",
@@ -84393,6 +84973,11 @@
   "en": "Document access policies",
   "src": "manual",
   "zh": "文件存取政策"
+ },
+ "94130cd2931421f9979d301f08244dcf1350e47d": {
+  "en": "Asking to turn on computer use",
+  "src": "manual",
+  "zh": "正在要求開啟電腦操作"
  },
  "94141bc536ffd78d7df2a27ea19dfd58f15abdad": {
   "en": "Diagnose my turnover",
@@ -85088,6 +85673,11 @@
   "en": "Member limit reached",
   "src": "manual",
   "zh": "已達成員數上限"
+ },
+ "954fd9ac33be652baa6c63d55a0742fe628d73c3": {
+  "en": "Add repositories",
+  "src": "manual",
+  "zh": "新增儲存庫"
  },
  "9554d837d81491db24962b44fe6444d62a0bd21d": {
   "en": "{count, plural, =0 {No browsers connected} one {# browser connected} other {# browsers connected}}",
@@ -85864,6 +86454,11 @@
   "src": "manual",
   "zh": "你已更新「{section}」的回答"
  },
+ "96b6e4ac607a50a23d7517f97cc54c3efee4fe45": {
+  "en": "Looking up {apps}",
+  "src": "manual",
+  "zh": "正在查詢 {apps}"
+ },
  "96b8eeb0bf884f46f1fab1ca989da8bdc859de8d": {
   "en": "Create profile",
   "src": "manual",
@@ -86054,6 +86649,11 @@
   "src": "C04",
   "zh": "無法載入您的帳單地址。請關閉後重新開啟以再試一次。"
  },
+ "971836e70d937bdb1b0714dae1fa03105c99edb0": {
+  "en": "Reading widget context",
+  "src": "manual",
+  "zh": "正在讀取小工具上下文"
+ },
  "971842957abfd8f7ca85d2678633c4ba94668b1a": {
   "en": "Rounded up to the nearest {step}. Requests above {ceiling, number} take longer to review.",
   "src": "manual",
@@ -86148,6 +86748,11 @@
   "en": "Draft a job description",
   "src": "B03",
   "zh": "草擬職務說明"
+ },
+ "973d7657d0a1ec3d6750a206cdcf219445f0963a": {
+  "en": "Padded, repetitive, or far longer than the ask needed.",
+  "src": "manual",
+  "zh": "內容冗贅、重複，或遠超出要求所需的長度。"
  },
  "973d7f3a59db6c3d52838160fdf62a64231efb44": {
   "en": "Your ssh can’t read your SSH configuration",
@@ -87183,6 +87788,11 @@
   "en": "Anthropic’s recommended default{resolved} is disabled in Model access. Turn it back on above, or choose a specific model.",
   "src": "C01",
   "zh": "Anthropic 建議的預設值{resolved}已在「模型存取」中停用。請在上方重新開啟，或選擇特定模型。"
+ },
+ "99143c252ac719250bf67556169ad16ab97c7861": {
+  "en": "{name} said: {prompt}",
+  "src": "manual",
+  "zh": "{name} 說：{prompt}"
  },
  "99166143a129394aac8118e0e52fa507c5f17ccf": {
   "en": "You haven’t submitted any plugins yet.",
@@ -88253,6 +88863,11 @@
   "en": "Only set if your IdP requires an exact-match redirect port. Entra accepts any.",
   "src": "C10",
   "zh": "僅在您的 IdP 需要完全比對的重新導向連接埠時才設定。Entra 接受任意連接埠。"
+ },
+ "9aeae41c217c0d5cd3a8e41147dcb27a10d7915b": {
+  "en": "Bringing a window to this desktop",
+  "src": "manual",
+  "zh": "正在將視窗移至此桌面"
  },
  "9aedb0d32720440900a0317bac9a6f4dbbdd574d": {
   "en": "Take a page I’ve inherited and rebuild it as working code: I’ll describe it — or default to the cluttered pricing page every designer inherits — then deliver the redesigned page as real HTML and CSS, before and after side by side, each fix explained in one line, ready to preview.",
@@ -89394,6 +90009,11 @@
   "src": "B00",
   "zh": "由 {signerEmail} 於 {date} 接受"
  },
+ "9cfe0da0510fd766e002d2507fc1a02163753502": {
+  "en": "This app suggests connecting another connector",
+  "src": "manual",
+  "zh": "此應用程式建議連接另一個連接器"
+ },
  "9d0029c1e290601646a0f8b12d996ffaa88daf66": {
   "en": "+ more",
   "src": "A00",
@@ -89804,6 +90424,11 @@
   "src": "B08",
   "zh": "正在處理文件…"
  },
+ "9dbaec675aa9f47d014d18a73458b26a57d33e15": {
+  "en": "published by {name}",
+  "src": "manual",
+  "zh": "由 {name} 發布"
+ },
  "9dbd15ba69a4b7c1278beef466037167c9e90609": {
   "en": "e.g. Design jam",
   "src": "A08",
@@ -89893,6 +90518,11 @@
   "en": "Build a reporting pipeline with me",
   "src": "B00",
   "zh": "跟我一起建立報表產製流程"
+ },
+ "9de87485e5559768e2b8c452a73605af6b156021": {
+  "en": "Searching apps for “{query}”",
+  "src": "manual",
+  "zh": "正在應用程式中搜尋「{query}」"
  },
  "9ded4929faa657e649873f7287eeba2a091dd08b": {
   "en": "Pre-installed for all users. Users can disable or uninstall it.",
@@ -90188,6 +90818,11 @@
   "en": "Collapse sidebar",
   "src": "A01",
   "zh": "收合側邊欄"
+ },
+ "9e6880dc94a19b6bf536f598fb8c575562908d55": {
+  "en": "Gift purchases are paused right now. Check back soon.",
+  "src": "manual",
+  "zh": "禮物購買目前已暫停。請稍後再回來查看。"
  },
  "9e69365e6c2e6fa0c3476c55c2a472b7b6458378": {
   "en": "Chat suggestions enabled",
@@ -91429,6 +92064,11 @@
   "src": "B02",
   "zh": "永久刪除集區"
  },
+ "a0a48ab64abdb52ea259b2c98163d89265049210": {
+  "en": "Pipeline manager",
+  "src": "manual",
+  "zh": "管線管理器"
+ },
  "a0b16591612f6a0be1a1df41585e17df29025301": {
   "en": "This feature has been disabled by your administrator.",
   "src": "B07",
@@ -92478,6 +93118,11 @@
   "en": "Display name must be {max} characters or fewer.",
   "src": "B02",
   "zh": "顯示名稱不得超過 {max} 個字元。"
+ },
+ "a2536a3c14ff4aa9321b845772778136a0331933": {
+  "en": "Listing apps",
+  "src": "manual",
+  "zh": "正在列出應用程式"
  },
  "a2562690818adae41c773c584b6f6c09ebb4d39c": {
   "en": "Env",
@@ -94274,6 +94919,11 @@
   "src": "A07",
   "zh": "工具權限"
  },
+ "a54c81dfcb45d95288e4942ed0a223fbf92a2a91": {
+  "en": "The scan timed out waiting for other scans in your organization to finish. Run it again once fewer scans are in progress.",
+  "src": "manual",
+  "zh": "掃描在等待您組織中其他掃描完成時逾時。請等進行中的掃描減少後再執行一次。"
+ },
  "a54e0dbe23deb90899d51db17205f001a4979790": {
   "en": "<lead>Now in</lead> <ref>{repo}</ref>",
   "src": "manual",
@@ -96014,6 +96664,11 @@
   "src": "B08",
   "zh": "檢視全部 {count} 個檔案"
  },
+ "a871b0a27d41326245ce4bceac7f7ba69ed4ce71": {
+  "en": "Forgot earlier context",
+  "src": "manual",
+  "zh": "遺忘先前的上下文"
+ },
  "a87257075473da271cced6c86ecaba13935d176b": {
   "en": "Share this security scan and its findings with your organization.",
   "src": "C12",
@@ -96763,6 +97418,11 @@
   "en": "Get free access to Claude for Excel and PowerPoint. Plus Cowork, Claude Code, and more.",
   "src": "C07",
   "zh": "免費取得 Claude for Excel 與 PowerPoint 的使用權，還有 Cowork、Claude Code 等更多功能。"
+ },
+ "a9ddf3f8cd08dbf2918857b8ccec30c79e166f4f": {
+  "en": "{added, plural, =0 {No skills were added.} one {<b># skill added</b> — <a>view it in Skills</a>.} other {<b># skills added</b> — <a>view them in Skills</a>.}}",
+  "src": "manual",
+  "zh": "{added, plural, =0 {未新增任何技能。} one {<b>已新增 # 個技能</b> —— <a>在「技能」中查看</a>。} other {<b>已新增 # 個技能</b> —— <a>在「技能」中查看</a>。}}"
  },
  "a9e13f43ab37d9e7abdccbbabbdbad3070bb656c": {
   "en": "Extra string claims merged into the JWT, as a JSON object with string values.",
@@ -98493,6 +99153,11 @@
   "en": "Asking to use {host}",
   "src": "manual",
   "zh": "正在要求使用 {host}"
+ },
+ "acac7fa83e2ab8dce86540ae2149a9c6c83275b5": {
+  "en": "Task not found.",
+  "src": "manual",
+  "zh": "找不到任務。"
  },
  "acac92e1907256cde19c9122a42921690d2b101e": {
   "en": "Missing repos from {orgs}?",
@@ -100369,6 +101034,11 @@
   "src": "A03",
   "zh": "法務與法規遵循"
  },
+ "afda875d0e7b4c56c99517705521c358aab1a742": {
+  "en": "What worked well? What didn’t? Specific examples help most.",
+  "src": "manual",
+  "zh": "哪些做得好？哪些不好？具體的例子最有幫助。"
+ },
  "afdda3265e6e14107096d7ae3417ecb325cee0a2": {
   "en": "Usage settings…",
   "src": "A07",
@@ -102139,6 +102809,11 @@
   "src": "B03",
   "zh": "啟用技能失敗。您可以再試一次。"
  },
+ "b2b93f33706f08b3d442e18520828903d23272af": {
+  "en": "Claude can’t access {repos}. <install>Install the Claude GitHub App on {count, plural, one {this repo} other {these repos}}</install>, or <reconnect>reconnect GitHub</reconnect> if it’s already installed.",
+  "src": "manual",
+  "zh": "Claude 無法存取 {repos}。請<install>在{count, plural, one {這個儲存庫} other {這些儲存庫}}上安裝 Claude GitHub App</install>，若已安裝則<reconnect>重新連接 GitHub</reconnect>。"
+ },
  "b2ba4a1f20ac25b52d196bd71c7ee5726cd6bc2d": {
   "en": "Imported {recovered, plural, one {# session} other {# sessions}}.",
   "src": "C08",
@@ -102558,6 +103233,11 @@
   "en": "Hidden here: the card needs a desktop-width window (and not a mobile browser).",
   "src": "manual",
   "zh": "此處隱藏：此卡片需要桌面寬度的視窗（且不能是行動裝置瀏覽器）。"
+ },
+ "b3650cb6c835bd14169f43d2c030120e410d07ac": {
+  "en": "Update todo list",
+  "src": "manual",
+  "zh": "更新待辦清單"
  },
  "b3687c1f50ced19403336e6a9130202ce2bc8923": {
   "en": "This routine was disabled because its cron expression is invalid. Edit the schedule and re-enable it.",
@@ -103613,6 +104293,11 @@
   "en": "Couldn’t delete the SSH connection. You can try again.",
   "src": "manual",
   "zh": "無法刪除 SSH 連線。您可以再試一次。"
+ },
+ "b5225f25ed818d8366e17e1e22caa09d70c3842c": {
+  "en": "Annotation tool",
+  "src": "manual",
+  "zh": "註解工具"
  },
  "b5230ecdf4e78f0dd162281a0a78c6cdc853cbe8": {
   "en": "Schema",
@@ -105559,6 +106244,11 @@
   "src": "B02",
   "zh": "無法載入存取套組。"
  },
+ "b87077b13bdda807075c31273260971e9a366cdc": {
+  "en": "Why does your district need more seats?",
+  "src": "manual",
+  "zh": "您的學區為什麼需要更多席次？"
+ },
  "b872730bcd535b082d715d3df198a82f6b113128": {
   "en": "Download iOS app",
   "src": "A02",
@@ -106469,6 +107159,11 @@
   "src": "A08",
   "zh": "↻ 重試"
  },
+ "ba1e935961f953ab0194fbf1dd283c59797cf63b": {
+  "en": "Searching project knowledge",
+  "src": "manual",
+  "zh": "正在搜尋專案知識"
+ },
  "ba1f0743e54629eea8b6b2e4d0bd3c5f38acfd98": {
   "en": "You’re on {from}. Roll back to {to}?",
   "src": "B09",
@@ -106548,6 +107243,11 @@
   "en": "Show Changes",
   "src": "manual",
   "zh": "顯示變更"
+ },
+ "ba3eb483c6b764eda21831d297580464cb4265f7": {
+  "en": "Couldn’t check this credential’s setup link, so Enable is unavailable. Reload to try again.",
+  "src": "manual",
+  "zh": "無法檢查此認證資訊的設定連結，因此無法使用「啟用」。請重新載入後再試一次。"
  },
  "ba427d853a207d4ef4d3b286addd71a0264466a8": {
   "en": "Upload another certificate",
@@ -107369,6 +108069,11 @@
   "src": "B06",
   "zh": "執行功能測試——呼叫 {count} 個唯讀工具"
  },
+ "bb8e1795bfd0b89e9dd67e69b25f0317e7bc319e": {
+  "en": "Couldn’t upload file",
+  "src": "manual",
+  "zh": "無法上傳檔案"
+ },
  "bb8fa05e93f42d2dc80518baf0935469205ddedf": {
   "en": "Set up…",
   "src": "A06",
@@ -107378,6 +108083,11 @@
   "en": "Show last 30 days",
   "src": "A06",
   "zh": "顯示過去 30 天"
+ },
+ "bb94ce93574b1396f511c747d445ad9146526cb2": {
+  "en": "Desktop app version",
+  "src": "manual",
+  "zh": "桌面版應用程式版本"
  },
  "bb966dac18d3dea4c870364d151138a5f752a602": {
   "en": "It will be enabled for all <b>{count, plural, one {# member} other {# members}}</b> with the User, Admin, Owner, or Primary owner role.",
@@ -107599,6 +108309,11 @@
   "src": "manual",
   "zh": "已處於規劃模式，尚未寫入任何規劃。"
  },
+ "bbe5aa7b4833a5eda79f23387431548e2ab35ba0": {
+  "en": "Looking up apps",
+  "src": "manual",
+  "zh": "正在查詢應用程式"
+ },
  "bbe988a49243421e13da0477bf95096a912e64d8": {
   "en": "Failed to archive scan. You can try again.",
   "src": "B03",
@@ -107803,6 +108518,11 @@
   "en": "A scope for this workspace already exists. Edit the existing scope instead of adding it again.",
   "src": "manual",
   "zh": "此工作區的範圍已存在，請編輯現有範圍，不要再次新增。"
+ },
+ "bc3e50a6041df10efa1ce7aca2c85e34b1d2c93f": {
+  "en": "Too wordy",
+  "src": "manual",
+  "zh": "過於冗長"
  },
  "bc42fe866ede587dec6c93b6a10c4245ffd7da4c": {
   "en": "Collapse folder {name}",
@@ -109553,6 +110273,11 @@
   "en": "Keep Claude running in the system tray.",
   "src": "manual",
   "zh": "讓 Claude 在系統匣中持續執行。"
+ },
+ "bf9c85997e50cac1e22127c9d97e6eedb4c5cf56": {
+  "en": "{attention, plural, one {# needs} other {# need}} your attention in the list.",
+  "src": "manual",
+  "zh": "清單中有 {attention, plural, one {# 項} other {# 項}}需要您處理。"
  },
  "bfa2e35846a18794660dd30bab0c379745df727d": {
   "en": "Trust policy JSON",
@@ -111919,6 +112644,11 @@
   "src": "manual",
   "zh": "此外掛程式將從您的上傳項目中永久移除。"
  },
+ "c39cae474e37bf3bf0b85cbfb63b8a1e973704de": {
+  "en": "Asking for full control of your screen",
+  "src": "manual",
+  "zh": "正在要求您螢幕的完整控制權"
+ },
  "c39dd4a8decced7e2107369a41b2b4a77690b630": {
   "en": "The MCP directory is where Claude users discover and connect to remote MCP servers. Once your server is reviewed and published, it’s available across Claude products. Submission and inclusion in the directory <em>does not change the functionality of your connector</em>. It simply allows it to be listed.",
   "src": "C14",
@@ -112248,6 +112978,11 @@
   "en": "Artifact · {host}",
   "src": "manual",
   "zh": "Artifact · {host}"
+ },
+ "c43ec90fe367083fb8479483265794423b94cf17": {
+  "en": "Editing file",
+  "src": "manual",
+  "zh": "正在編輯檔案"
  },
  "c44081f37b2ff42788c9f311e911edb5b44c3d85": {
   "en": "Browse {count, plural, one {# more connector} other {# more connectors}}",
@@ -112653,6 +113388,11 @@
   "en": "No remote control session found. Start one from your CLI, then refresh:",
   "src": "C10",
   "zh": "找不到遠端控制工作階段。請從您的 CLI 啟動一個，然後重新整理："
+ },
+ "c515cb588794b7aa5727a04af97aaa890d06fb2b": {
+  "en": "Opening file",
+  "src": "manual",
+  "zh": "正在開啟檔案"
  },
  "c5160608b59344e3dc4ab12c7ccf90c644209cef": {
   "en": "Allow Claude to <b>use</b> these capabilities?",
@@ -113994,6 +114734,11 @@
   "src": "B04",
   "zh": "探究科學謎團"
  },
+ "c773881c84764f1784b6701ca78c24ee81aad46e": {
+  "en": "Upload skills",
+  "src": "manual",
+  "zh": "上傳技能"
+ },
  "c7745ea8dd95384172110262f30df03d5235b8a5": {
   "en": "Failed to delete routine. Try again.",
   "src": "B03",
@@ -114103,6 +114848,11 @@
   "en": "Couldn’t load your other saved payment methods.",
   "src": "manual",
   "zh": "無法載入您其他已儲存的付款方式。"
+ },
+ "c7a0dd5ab6d43da7a0dd4be21e00c2697f0e6e79": {
+  "en": "<b>You’re testing an early model.</b> Tell us how it’s doing so far.",
+  "src": "manual",
+  "zh": "<b>您正在測試早期模型。</b>請告訴我們目前的表現如何。"
  },
  "c7a127453eaaf949117371e7f51627b2a8358e83": {
   "en": "No SSH hosts yet",
@@ -114438,6 +115188,11 @@
   "en": "8:00 PM",
   "src": "A00",
   "zh": "下午 8:00"
+ },
+ "c8237a41734b05243be1d1011fe5562114b018b5": {
+  "en": "Writing file",
+  "src": "manual",
+  "zh": "正在寫入檔案"
  },
  "c825e9359fe2bcbac5d2858e148c0f31cffc1cb2": {
   "en": "Turn my one-line lesson plan into tomorrow’s slides: I say topic, grade, and length; you build the warm-up, three teaching beats with visuals described, guided practice, and exit ticket — presenter notes under every slide, assumptions marked for me to correct.",
@@ -114859,6 +115614,11 @@
   "src": "A00",
   "zh": "（必填）"
  },
+ "c8f09c7af6b849bae8e22788c0736799d2348bca": {
+  "en": "Skimmed instead of digging in; didn’t open the doc, file, or thread it was given.",
+  "src": "manual",
+  "zh": "只略讀而未深入查看；沒有開啟收到的文件、檔案或討論串。"
+ },
  "c8f2dbdac0d5fdeb21d892d939141a28fd00617e": {
   "en": "Select file encoding",
   "src": "A06",
@@ -115178,6 +115938,11 @@
   "en": "This file is too large to share (over 1M characters).",
   "src": "B07",
   "zh": "此檔案過大，無法分享（超過 100 萬個字元）。"
+ },
+ "c972e3dbbfdd50263588572952536cc6b60cd920": {
+  "en": "This directory isn’t in the selected branch. Choose one from the list.",
+  "src": "manual",
+  "zh": "此目錄不在所選分支中。請從清單中選擇一個。"
  },
  "c973565e5d9cf6edbfa7e1d613622c7e5d4a859e": {
   "en": "Options are limited to the models your organization’s Claude Code model settings allow.",
@@ -116049,6 +116814,11 @@
   "src": "A06",
   "zh": "掃描 5 秒中…"
  },
+ "cb09601b97a637ceee0e2d8c1d75c825034f89a5": {
+  "en": "Previous comment",
+  "src": "manual",
+  "zh": "上一則留言"
+ },
  "cb0ab3da0580ad14b212c1d291d1a5b34a75c9a7": {
   "en": "Can edit",
   "src": "A01",
@@ -116674,6 +117444,11 @@
   "src": "manual",
   "zh": "合併以將所有內容集中在一處，或保持分開。"
  },
+ "cc16efdfef30b9caaea4179169ebe576320192fe": {
+  "en": "Capturing window",
+  "src": "manual",
+  "zh": "正在擷取視窗"
+ },
  "cc1bc38df66ba10ef87ebee6dde70d9ef10f3f5a": {
   "en": "File was deleted in this revision.",
   "src": "B03",
@@ -117253,6 +118028,11 @@
   "en": "The host’s SSH key has changed, so the connection is being refused. If the host was not rebuilt or re-keyed, do not trust the new key. Once known_hosts has the right key, the sessions you left running there reconnect.",
   "src": "manual",
   "zh": "此主機的 SSH 金鑰已變更，因此連線遭到拒絕。若該主機未曾重建或更換金鑰，請勿信任新金鑰。一旦 known_hosts 中有正確的金鑰，您留在該處執行中的工作階段即可重新連接。"
+ },
+ "cd2c5bf65480c1ee3b65dc969d3268f5374d9aa0": {
+  "en": "Replace the existing skill with {fileName}",
+  "src": "manual",
+  "zh": "以 {fileName} 取代現有技能"
  },
  "cd2ea69a3f95cab4b259cbd223fd844f6c0b0762": {
   "en": "Enter a GitHub repo like owner/repo or https://github.com/owner/repo.",
@@ -121864,6 +122644,11 @@
   "src": "B01",
   "zh": "連線到伺服器失敗，您可以再試一次。"
  },
+ "d57daac38594d210e7ab29ea3af2641109301bdc": {
+  "en": "Releasing {app}",
+  "src": "manual",
+  "zh": "正在釋放 {app}"
+ },
  "d58375f764073bdbdbb368b8aa0b96756808caca": {
   "en": "Renewal options",
   "src": "A05",
@@ -122023,6 +122808,11 @@
   "en": "File upload failed.",
   "src": "A02",
   "zh": "檔案上傳失敗。"
+ },
+ "d5cabb35dda97b3547f964f7fa02b13f5895432d": {
+  "en": "Searching Drive",
+  "src": "manual",
+  "zh": "正在搜尋 Drive"
  },
  "d5cc9cfe9effb466c51f77a40846f71d596d5161": {
   "en": "Updating project settings",
@@ -122718,6 +123508,11 @@
   "en": "Could not uninstall the plugin. Try again.",
   "src": "B02",
   "zh": "無法解除安裝外掛程式，請再試一次。"
+ },
+ "d70732b902a5140b6ff3e6a7a5d505b4d28638a7": {
+  "en": "Creating file",
+  "src": "manual",
+  "zh": "正在建立檔案"
  },
  "d7097cb207aa8b6f41a514ce780cdc9e4c3ba09b": {
   "en": "The GitHub App installation for this repository is not connected to this Claude organization. You’re a member of {login} on GitHub, but only an owner can connect it. Ask an owner of {login} who uses this Claude organization to connect GitHub from Claude settings. Once they’ve connected it, try again.",
@@ -125044,6 +125839,11 @@
   "src": "A04",
   "zh": "訂單摘要"
  },
+ "db194c8d4af5bdb21db317d108c448af1411aaa6": {
+  "en": "Skill files · {count, number}",
+  "src": "manual",
+  "zh": "技能檔案 · {count, number}"
+ },
  "db1a2e861912e567fb051fcedf1c211d0330049b": {
   "en": "That repository name isn’t valid.",
   "src": "B07",
@@ -125159,6 +125959,11 @@
   "src": "C19",
   "zh": "您的組織尚未設定任何允許的電子郵件網域。若要在邀請成員前修正此問題，請<link>聯絡支援團隊</link>"
  },
+ "db5caa2d5600bcc6136cdb74910c00f77444e45b": {
+  "en": "Performing browser actions",
+  "src": "manual",
+  "zh": "正在執行瀏覽器操作"
+ },
  "db5cfe281a80c1fccd50380b03368887c4562c96": {
   "en": "Check your trust policy",
   "src": "manual",
@@ -125194,6 +125999,11 @@
   "src": "B09",
   "zh": "{inviter} 邀請了 {email} 加入。"
  },
+ "db6a7d5856b0771e2e0318dd7df72b778800a912": {
+  "en": "Chats and Cowork tasks on Windows or behind an HTTP proxy, and the app’s own events, export over OTLP/HTTP to this same endpoint. Choose grpc only if the collector also accepts OTLP/HTTP there.",
+  "src": "manual",
+  "zh": "在 Windows 上或透過 HTTP Proxy 進行的聊天與 Cowork 任務，以及應用程式本身的事件，都會經由 OTLP/HTTP 匯出到同一個端點。只有在收集器該處也接受 OTLP/HTTP 時，才選擇 grpc。"
+ },
  "db6c8357141062d2c8446301f194c26bae406a76": {
   "en": "Grant roles",
   "src": "A03",
@@ -125208,6 +126018,11 @@
   "en": "Work in a project or folder",
   "src": "B08",
   "zh": "在專案或資料夾中作業"
+ },
+ "db6f2ea06fc3544757d00080064911e435239e5c": {
+  "en": "Allow your team to create scheduled and webhook-triggered routines that run Claude Code autonomously in the cloud. Turning this off also turns off Claude Tag and scheduled tasks for Cowork in the cloud. <link>Learn more</link>",
+  "src": "manual",
+  "zh": "允許您的團隊建立排程與 Webhook 觸發的例行任務，在雲端自主執行 Claude Code。關閉此項也會一併關閉 Claude Tag 與 Cowork 的雲端排程任務。<link>瞭解詳情</link>"
  },
  "db7258da849738b5a133ea2a6f08fbdd7725aa77": {
   "en": "Using {label}",
@@ -125423,6 +126238,11 @@
   "en": "Leaderboard view",
   "src": "A03",
   "zh": "排行榜檢視"
+ },
+ "dbc6d694d95996120d44a1ec50663dfac7a3b6a6": {
+  "en": "Stated something untrue, invented details, or claimed a task succeeded when it didn’t.",
+  "src": "manual",
+  "zh": "陳述不實內容、捏造細節，或在任務未成功時宣稱已成功。"
  },
  "dbca0125a597956747a8092cf1b49d9e87115a51": {
   "en": "Claude will pick up where it left off. Keep your computer awake so long tasks can finish.",
@@ -127099,6 +127919,11 @@
   "src": "manual",
   "zh": "找不到此工作階段"
  },
+ "deed8ddd7a6e4e84a6fb4638800a8b35580e805e": {
+  "en": "You can upload up to {max, number} skill files at a time.",
+  "src": "manual",
+  "zh": "一次最多可上傳 {max, number} 個技能檔案。"
+ },
  "deef9caffbf34018afa84359aa4ac3df6e73ab26": {
   "en": "Loading more projects…",
   "src": "B04",
@@ -127729,6 +128554,11 @@
   "src": "B07",
   "zh": "技能檔案過大，上限為 30 MB。"
  },
+ "dff3145db8c2ead4b1b46694b97621fafb65b67e": {
+  "en": "{repo}, add",
+  "src": "manual",
+  "zh": "{repo}，新增"
+ },
  "dff412c84b824ecac723ed072586da9471983534": {
   "en": "weekly {model} limit",
   "src": "A08",
@@ -127853,6 +128683,11 @@
   "en": "Folder must be inside the WSL distro. Choose a path under \\\\wsl.localhost\\…",
   "src": "C06",
   "zh": "資料夾必須位於 WSL 發行版內，請選擇 \\\\wsl.localhost\\… 底下的路徑。"
+ },
+ "e01f4254eed2c7d13197157734cff32e6602de5d": {
+  "en": "Available once the app has loaded this task",
+  "src": "manual",
+  "zh": "應用程式載入此任務後即可使用"
  },
  "e02142f0dea73ea780908357bcad93389f188de1": {
   "en": "Claude Code, wherever you are",
@@ -129374,6 +130209,11 @@
   "src": "manual",
   "zh": "告訴 Claude 您在 GitHub 上的身分。"
  },
+ "e2e37c83cea9ab6cd65a3d64dc37cd7d3ae76d57": {
+  "en": "{orgName} is out of Claude API credits, so its requests are failing.",
+  "src": "manual",
+  "zh": "{orgName} 的 Claude API 點數已用盡，因此要求失敗。"
+ },
  "e2e50deefec42d10f85fa8cba7d394fa25556898": {
   "en": "Adjust spend limit",
   "src": "A00",
@@ -129504,6 +130344,11 @@
   "src": "B03",
   "zh": "更新 API 權杖失敗。您可以再試一次。"
  },
+ "e32357532cae160e4de8ae053f5bd0ee64948988": {
+  "en": "Threads in this project will be archived and become read-only. You can unarchive the project at any time via the <link>projects page</link>.",
+  "src": "manual",
+  "zh": "此專案中的討論串將被封存並變成唯讀。您隨時可以透過<link>專案頁面</link>取消封存此專案。"
+ },
  "e323a9411dc4e2929761d5714bf57ecee4b51069": {
   "en": "Use the workspace or organization default",
   "src": "manual",
@@ -129513,6 +130358,11 @@
   "en": "{kind, select, widget {Widget} block {Block} other {Selected}} in {source} <muted>· {pageTitle} · “{preview}”</muted>",
   "src": "manual",
   "zh": "{kind, select, widget {小工具} block {區塊} other {已選取}}於 {source} <muted>· {pageTitle} · “{preview}”</muted>"
+ },
+ "e32d1e7c936c9db737c4bc99be0d961104e6477e": {
+  "en": "Deleting file",
+  "src": "manual",
+  "zh": "正在刪除檔案"
  },
  "e330a067d3e0311fa9fe09bad5533ba4c188d36d": {
   "en": "your {brand} ending {last4}",
@@ -129543,6 +130393,11 @@
   "en": "Build a campaign landing page",
   "src": "B00",
   "zh": "建立行銷活動到達頁面"
+ },
+ "e33b0a0d9ceaf3483041ec8f6f0b08a006998219": {
+  "en": "recorded automatically",
+  "src": "manual",
+  "zh": "自動記錄"
  },
  "e33d16559cf5e72048fe0fd935ef995cce41065f": {
   "en": "This setup’s place isn’t available right now",
@@ -129698,6 +130553,11 @@
   "en": "Google Cloud project ID for Vertex AI inference.",
   "src": "B04",
   "zh": "用於 Vertex AI 推論的 Google Cloud 專案 ID。"
+ },
+ "e36d841547758050d5e68407e6f8555ebf0b0abd": {
+  "en": "Viewing file",
+  "src": "manual",
+  "zh": "正在檢視檔案"
  },
  "e3718d505e0b3ef2e26b17de2e278cd543ccbcf8": {
   "en": "Couldn’t load connector permissions. Try again shortly.",
@@ -129969,6 +130829,11 @@
   "src": "A07",
   "zh": "取消封存 {count} 項"
  },
+ "e3e9790bb22267210676592340fa67225e3a22d6": {
+  "en": "Checking allowed apps",
+  "src": "manual",
+  "zh": "正在檢查允許的應用程式"
+ },
  "e3eab4447a8cdffb7114f61998253f3a120948db": {
   "en": "Bypass all permission checks and let Claude work uninterrupted. This works well for workflows like fixing lint errors or generating boilerplate code. Letting Claude run arbitrary commands is risky and can result in data loss, system corruption, or data exfiltration (e.g., via prompt injection attacks). <link>See best practices for safe usage</link>",
   "src": "C02",
@@ -129983,6 +130848,11 @@
   "en": "Searching for {pattern}",
   "src": "B06",
   "zh": "正在搜尋 {pattern}"
+ },
+ "e3ee5f32a270159ff7807f2489ce7241cf8ab87a": {
+  "en": "You’re part of an early access test. Your feedback goes straight to the team building this model.",
+  "src": "manual",
+  "zh": "您正在參與搶先體驗測試。您的意見回饋會直接送到打造此模型的團隊。"
  },
  "e3ee8f11863828ed08a84291bf0285b83385f04b": {
   "en": "Save {version} of {name}",
@@ -131139,6 +132009,11 @@
   "src": "B06",
   "zh": "儲存庫是空的（預設分支上沒有提交）。"
  },
+ "e5e03f5a27e603712cbabf0c747a046fc80eb1e3": {
+  "en": "Uploaded file",
+  "src": "manual",
+  "zh": "已上傳的檔案"
+ },
  "e5e2ff78280ad43b938b738d66a65e2e11a8c841": {
   "en": "Type in something like: Second-year economics, mostly essays and problem sets…",
   "src": "manual",
@@ -132068,6 +132943,11 @@
   "en": "Failed to scroll",
   "src": "manual",
   "zh": "捲動失敗"
+ },
+ "e78c5c5bed299592c47b96ca76ea6b9e4199b3f1": {
+  "en": "Releasing app control",
+  "src": "manual",
+  "zh": "正在釋放應用程式控制權"
  },
  "e78cec920f1cee3133ed6b8317cf07c99a24c2c5": {
   "en": "What is your issue about?",
@@ -133574,6 +134454,11 @@
   "src": "B01",
   "zh": "Claude 想要變更成員的席次"
  },
+ "ea1b2559ad11c8a0ce6951a89d5ecbf9340482af": {
+  "en": "Only people with access",
+  "src": "manual",
+  "zh": "僅限具有存取權的人"
+ },
  "ea1b388fbe91c9241c7205204e62ebe843f1294e": {
   "en": "To keep your existing restrictions, add the following to your organization’s Managed settings or deploy it via MDM:",
   "src": "C16",
@@ -133903,6 +134788,11 @@
   "en": "Cowork spotlight illustration",
   "src": "B02",
   "zh": "Cowork 精選插圖"
+ },
+ "ea982dbe69dba8a40c96736c77a2493bb1e89c06": {
+  "en": "Sort applies to search results",
+  "src": "manual",
+  "zh": "排序會套用至搜尋結果"
  },
  "ea99708ed64c018f3f5eb96b0512cd6c570d5353": {
   "en": "Fast mode respects spend limits set.",
@@ -135428,6 +136318,11 @@
   "en": "Verify your phone number",
   "src": "B08",
   "zh": "驗證您的電話號碼"
+ },
+ "ed6462059aa3db4a56ceaa92c81ef0fbf9da7d13": {
+  "en": "This task is in the middle of a step and will link to this computer when the step finishes.",
+  "src": "manual",
+  "zh": "此任務正在執行某個步驟，會在該步驟完成後連結至這台電腦。"
  },
  "ed67450e82e03648777f8fb080737af574005ce8": {
   "en": "Enable notifications in your browser settings to get updates when tasks complete.",
@@ -137034,6 +137929,11 @@
   "src": "B07",
   "zh": "為供稽核記錄使用，此金鑰會以 {badge} 保留在您的清單中。"
  },
+ "f0412cd5290410f76ad552722535425e21afc048": {
+  "en": "Not uploaded yet",
+  "src": "manual",
+  "zh": "尚未上傳"
+ },
  "f0442a7406aa926329aff5d0f12aaa989a7b31b1": {
   "en": "{host} accepted your SSH key but this computer couldn’t sign with it (passphrase not loaded, or key file permissions too open). Run ssh-add or chmod 600 the key; your message goes as soon as Claude sees the agent change, or retry now.",
   "src": "manual",
@@ -138189,6 +139089,11 @@
   "src": "B00",
   "zh": "PR 合併後自動封存"
  },
+ "f26f3d1ef6e09d5c5fbedafd310b04861025d74d": {
+  "en": "Choose a rule",
+  "src": "manual",
+  "zh": "選擇規則"
+ },
  "f26f71da75689eb37bd0cebc3079e48a58ce1728": {
   "en": "Checking for the Android SDK…",
   "src": "B01",
@@ -139083,6 +139988,11 @@
   "en": "Use Claude together with your teammates on the Enterprise plan. Name your team something they’ll recognize.",
   "src": "C17",
   "zh": "與您的團隊成員在企業方案中共同使用 Claude。請為您的團隊取一個成員一看就懂的名稱。"
+ },
+ "f4042996497a03c0db681f54e2e250c8886c4ad3": {
+  "en": "If your organization allows it, this task will use the computer this conversation is tied to, including its local folders and Claude in Chrome; otherwise it will run in the cloud only.",
+  "src": "manual",
+  "zh": "若您的組織允許，此任務會使用這個對話所綁定的電腦，包括它的本機資料夾與 Claude in Chrome；否則只會在雲端執行。"
  },
  "f4042f5fccd2db9a94f1130018cf02d7086acf46": {
   "en": "Define sets of capabilities, permissions, and connectors to assign to a group. Roles apply only to members whose role type is set to <b>Custom</b> on the <membersLink>Members</membersLink> page, and can’t grant features disabled at the organization level. See the <setupGuideLink>setup guide</setupGuideLink> or learn more about <helpLink>roles and permissions</helpLink>.",
@@ -141104,6 +142014,11 @@
   "src": "B09",
   "zh": "以及 {spaces, plural, one {# 個 Space} other {# 個 Space}}"
  },
+ "f7904b09be2caf3264c4d3e6d688d78b0105967f": {
+  "en": "Saving {current, number} of {total, number}…",
+  "src": "manual",
+  "zh": "正在儲存第 {current, number} 個，共 {total, number} 個…"
+ },
  "f79c585955a9d0349d0bbb5c2e78226c11e7c086": {
   "en": "What’s up next, {name}?",
   "src": "B08",
@@ -141568,6 +142483,11 @@
   "en": "Navigate to your project",
   "src": "B05",
   "zh": "前往您的專案"
+ },
+ "f87325556299da67daf998c8313e2dbe29084194": {
+  "en": "View setup",
+  "src": "manual",
+  "zh": "檢視設定流程"
  },
  "f8768377a61d60d4ca2a9b7956b923d4109512df": {
   "en": "Never include customer PII in responses",
@@ -142159,6 +143079,11 @@
   "src": "A04",
   "zh": "開啟桌面版應用程式"
  },
+ "f977dd7037c088bd3359bfe97af4ae56be61742f": {
+  "en": "Everyone in {orgName}",
+  "src": "manual",
+  "zh": "{orgName} 中的所有人"
+ },
  "f97f5563b7f2087f75e007f582d9a25048ade566": {
   "en": "Caterer",
   "src": "A01",
@@ -142173,6 +143098,11 @@
   "en": "Upload materials, set custom instructions, and organize conversations in one space.",
   "src": "C17",
   "zh": "在同一個空間中上傳資料、設定自訂指示，並整理您的對話。"
+ },
+ "f986e970f37cac157b394cbcaa16549efddf28a2": {
+  "en": "Included skills",
+  "src": "manual",
+  "zh": "隨附的技能"
  },
  "f989f9e75cf7f40dd32db8aa4a76d55afbab0181": {
   "en": "Increase limit for {groupName} group",
@@ -143269,6 +144199,11 @@
   "src": "manual",
   "zh": "你看過每種體驗的次數，對照其上限。"
  },
+ "fb84c7fb15c7ea2807f7f7984f1b5adfef6e2562": {
+  "en": "Support queue",
+  "src": "manual",
+  "zh": "支援佇列"
+ },
  "fb87d8be55ad4a4260d25b2524e872da6c18f452": {
   "en": "A hosted environment is required. Add one in Settings → Environment.",
   "src": "C00",
@@ -144108,6 +145043,11 @@
   "en": "Authorizing for {orgName}",
   "src": "B00",
   "zh": "正在為 {orgName} 進行授權"
+ },
+ "fd067a8e994795b726413179d2b1febd36a007ca": {
+  "en": "Reading menu bar",
+  "src": "manual",
+  "zh": "正在讀取選單列"
  },
  "fd0c97e4c4b1ec865e2d39a1e0f6d0f189f2213a": {
   "en": "save a version of this artifact",
@@ -145044,6 +145984,11 @@
   "src": "C16",
   "zh": "此角色透過一項此畫面目前無法顯示或編輯的設定，授予廣泛的功能存取權。成員實際擁有的存取權，可能比下方切換開關顯示的更多。"
  },
+ "fea06bbc0d5e0519db72c9d97db718cb36b3f94e": {
+  "en": "Made things up",
+  "src": "manual",
+  "zh": "捏造內容"
+ },
  "fea1d712373a978b4daebb4ee1424c6927d554b4": {
   "en": "Per-category amounts aren’t available yet. This preview shows the categories only.",
   "src": "C10",
@@ -145718,6 +146663,11 @@
   "en": "Not seeing the code? <tryAgainLink>Try again</tryAgainLink>",
   "src": "B05",
   "zh": "沒看到驗證碼？<tryAgainLink>再試一次</tryAgainLink>"
+ },
+ "ffe30345e206335bebd253082f6944c25e8768da": {
+  "en": "Scheduled tasks use Routines to run in the cloud. <link>Manage in Claude Code settings</link>",
+  "src": "manual",
+  "zh": "排程任務使用例行任務在雲端執行。<link>在 Claude Code 設定中管理</link>"
  },
  "ffe55ad979583f904e8e3fdf2124c11d862ba541": {
   "en": "Your personal account will close. Choose what happens to your data.",
